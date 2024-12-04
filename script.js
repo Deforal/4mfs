@@ -42,6 +42,7 @@ function categories() {
         return response.json();
     })
     .then(result => {
+        console.log(result)
         const container = document.getElementById('categories__grid');
         let htmlInner = '';
         let currentCategory = '';
@@ -159,8 +160,14 @@ function Login_form() {
     if (localStorage.getItem("LoggedIn") == "true") {
         const reg_main = document.getElementById("reg__main")
         reg_main.innerHTML = ` 
-        
-        
+        <section class="reg__section center">
+        <h1>Добро пожаловать, user</h1>
+        <button class="contacts_submit" onclick="localStorage.setItem('LoggedIn', 'reg')">Выйти</button>
+        <p>Корзина:</p>
+        <div id="cart_div"></div>
+        <p>Ваши прошлые заказы:</p>
+        <div id="previous_offers"></div>
+        </section>
         `
     } else {
         if (localStorage.getItem("LoggedIn") == "reg") {
@@ -183,7 +190,7 @@ function Login_form() {
         } else {
             const reg_main = document.getElementById("reg__main")
             reg_main.innerHTML = `
-            <form action="register.php" method="post" class="reg__form center" id="reg_form">
+            <form action="register.php" method="post" class="reg__form center" id="login_form">
             <h2 class="payment_header center">Вход</h2> 
             <p class="name_of_textbox center">Логин:</p>
             <input type="pas" name="" class="contacts_textbox" placeholder="E-mail или имя пользователя">
