@@ -1,3 +1,53 @@
+function header() {
+    const header = document.querySelectorAll(".header_mass")
+    header.forEach(element => {
+        let content = `
+        <div class="top_else">
+            <div class="top__logo">
+                <a href="main.html"><img src="img/layer1.svg" alt=""></a>
+            </div>
+            <nav class="top__nav">
+            `
+            if (element.dataset.header == "Login") {
+                content += `
+                <a href="catagories.html" class="top__nav_category">Категории</a>
+                `
+            } else if (element.dataset.header == "categories") {
+                content +=`
+                <a href="Login_form.html" class="top__nav_sales">Вход/Регистрация</a>
+                `
+            } else {
+                content +=`
+                <a href="catagories.html" class="top__nav_category">Категории</a>
+                <a href="Login_form.html" class="top__nav_sales">Вход/Регистрация</a>
+                `
+            }
+        content += `</nav> </div>`
+        element.innerHTML += content
+    });
+}
+function footer() {
+    const footer = document.querySelectorAll(".footer")
+    footer.forEach(element => {
+        element.innerHTML += `
+        <div class="footer__logo">
+        <a href="main.html"><img src="img/layer1.svg" alt=""></a>
+        </div>
+        <nav class="footer__nav">
+            <div class="footer__nav_links">
+                <a href="manufactors.html">Производители</a>
+                <a href="delivery.html">Доставка</a>
+                <a href="payment.html">Оплата</a>
+                <a href="contacts.html">Обратная связь</a>
+            </div>
+            <p>г.Иркутск, ул. Баррикад, д. 147 Телефон: (8924) 70-11-548  e-mail: epikego@mail.ru</p>
+        </nav>`
+    });
+}
+document.addEventListener('DOMContentLoaded', () => {
+    header()
+    footer()
+})
 function sales() {
     fetch('data.php')
     .then(response => {
@@ -9,7 +59,7 @@ function sales() {
     .then(result => {
         const container = document.getElementById('categories__grid');
         let htmlInner = '';
-        htmlInner += '<section class="categories__grid bottom_margin_123px center">';
+        htmlInner += '<section class="item_grid bottom_margin_123px center">';
         const filteredData = result.filter(item => item.Special_price != null)
         filteredData.forEach(item => {
         htmlInner += `
@@ -42,7 +92,6 @@ function categories() {
         return response.json();
     })
     .then(result => {
-        console.log(result)
         const container = document.getElementById('categories__grid');
         let htmlInner = '';
         let currentCategory = '';
@@ -60,8 +109,8 @@ function categories() {
         console.log(array)
         array.forEach(item => {
             count = 0
-            htmlInner += `<h2 class="categories__section_header center" id="${item}_categories">${item}</h2>`;
-            htmlInner += '<section class="categories__grid bottom_margin_123px center">'; // Start new section
+            htmlInner += `<h2 class="categories_section_header center" id="${item}_categories">${item}</h2>`;
+            htmlInner += '<section class="item_grid bottom_margin_123px center">'; // Start new section
             while (count < result.length - 1) {
                 if (item == result[count].Category) {
                     if (result[count].Special_price !== null) {
@@ -128,7 +177,7 @@ function sortByPrice() {
 
         // Build HTML to display sorted items
         const container = document.getElementById('categories__grid');
-        let htmlInner = '<section class="categories__grid bottom_margin_123px center">'; // Start new section
+        let htmlInner = '<section class="item_grid bottom_margin_123px center">'; // Start new section
         items.forEach(item => {
             htmlInner += `
             <div class="item_div">
@@ -150,111 +199,85 @@ function sortByPrice() {
         console.error('There was a problem with the fetch operation:', error);
     });
 }
-if (localStorage.getItem("LoggedIn") == "true") {
-    const reg_links = document.querySelectorAll(".registration-link")
-    reg_links.forEach(element => {
-        element.innerHTML = "Профиль"
-});
-}
-function Login_form() {
-    if (localStorage.getItem("LoggedIn") == "true") {
-        const reg_main = document.getElementById("reg__main")
-        reg_main.innerHTML = ` 
-        <section class="reg__section center">
-        <h1>Добро пожаловать, user</h1>
-        <button class="contacts_submit" onclick="localStorage.setItem('LoggedIn', 'reg')">Выйти</button>
-        <p>Корзина:</p>
-        <div id="cart_div"></div>
-        <p>Ваши прошлые заказы:</p>
-        <div id="previous_offers"></div>
-        </section>
-        `
-    } else {
-        if (localStorage.getItem("LoggedIn") == "reg") {
-            const reg_main = document.getElementById("reg__main")
-            reg_main.innerHTML = `
-            <form action="register.php" method="post" class="reg__form center" id="reg_form">
-            <h2 class="payment_header center">Регистрация</h2> 
-            <p class="name_of_textbox center">E-mail:</p>
-            <input type="email" name="email" class="contacts_textbox" placeholder="example@mail.ru" required>
-            <p class="name_of_textbox center">Имя пользователя:</p>
-            <input type="text" name="username" class="contacts_textbox" placeholder="Имя пользователя" required>
-            <p class="name_of_textbox center">Пароль:</p>
-            <input type="password" name="password" class="contacts_textbox" required>
-            <p class="name_of_textbox center">Подтверждение пароля:</p>
-            <input type="password" name="confirm_password" class="contacts_textbox" required>
-            <button type="submit" class="contacts_submit">Отправить</button>
-            <a href="" class="reg__a" onclick="localStorage.setItem('LoggedIn', 'log')">Зарегестрироваться</a>
-            </form>
-            `
+document.getElementById("reg_form").addEventListener('submit', function(event) {
+    event.preventDefault()
+    const fields = document.querySelectorAll ('[data-register]')
+    const Allfields = {}
+    const element = document.querySelector(".form_error")
+    fields.forEach(field => {
+        if (field.value == '') {
+            field.style.backgroundColor = "rgba(255, 0, 0, 0.452)"
+            return;
         } else {
-            const reg_main = document.getElementById("reg__main")
-            reg_main.innerHTML = `
-            <form action="register.php" method="post" class="reg__form center" id="login_form">
-            <h2 class="payment_header center">Вход</h2> 
-            <p class="name_of_textbox center">Логин:</p>
-            <input type="pas" name="" class="contacts_textbox" placeholder="E-mail или имя пользователя">
-            <p class="name_of_textbox center">Пароль:</p>
-            <input type="password" name="" class="contacts_textbox">
-            <button type="submit" class="contacts_submit">Отправить</button>
-            <a href="" class="reg__a" onclick="localStorage.setItem('LoggedIn', 'reg')">Войти</a>
-            </form>
-            `
-        }
-    }
-}
-document.getElementById('reg_form').addEventListener('submit', function(event) {
-    event.preventDefault(); // Prevent the default form submission
-
-    // Get form values
-    const email = document.querySelector('input[name="email"]').value.trim();
-    const username = document.querySelector('input[name="username"]').value.trim();
-    const password = document.querySelector('input[name="password"]').value.trim();
-    const confirmPassword = document.querySelector('input[name="confirm_password"]').value.trim();
-
-    // Validate form fields
-    if (!email || !username || !password || !confirmPassword) {
-        alert("Please fill in all fields.");
-        return;
-    }
-
-    if (password !== confirmPassword) {
-        alert("Passwords do not match.");
-        return;
-    }
-
-    // Prepare data to be sent
-    const formData = new FormData();
-    formData.append('email', email);
-    formData.append('username', username);
-    formData.append('password', password);
-
-    // Send data to PHP script using fetch API
-    fetch('register.php', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            alert("Registration successful!");
-            localStorage.setItem("LoggedIn", "true")
-            // const registrationLink = document.querySelectorAll('.registration-link');
-            // registrationLink.forEach(element => {
-            //     if (element) {
-            //         element.href = 'new_link.html'; // Replace with your desired link
-            //         element.textContent = 'New Link Text'; // Optionally change the link text
-            //     }
-            // });
+            Allfields[field.dataset.register] = field.value
+            field.style.backgroundColor = ""
             
-            // Optionally redirect to another page
-            window.location.href = 'main.html';
-        } else {
-            alert("Registration failed: " + data.message);
         }
     })
-    .catch(error => {
-        console.error('Error:', error);
-        alert("There was an error with the registration.");
-    });
-});
+
+    if (Allfields.Rpassword !== Allfields.password) {
+        element.style.display = "block"
+        element.textContent = "Пароли не совпадают"
+        return;
+    } else {
+        element.style.display = "none"
+    }
+    delete Allfields.Rpassword;
+    fetch("register.php", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(Allfields)
+    })
+    .then(response => response.json()) 
+    .then(data => {
+        let jsonData = data;
+        console.log(jsonData);
+        if (jsonData.success) {
+            element.style.display = "none";
+            alert(jsonData.success); 
+        } else {
+            element.style.display = "block";
+            element.textContent = jsonData.error;
+        }
+    })
+    .catch(error => console.error("Error:", error));
+})
+document.getElementById("log_form").addEventListener('submit', function(event) {
+    event.preventDefault()
+    const fields = document.querySelectorAll ('[data-login]')
+    const Allfields = {}
+    const element = document.querySelector(".form_error")
+    fields.forEach(field => {
+        if (field.value == '') {
+            field.style.backgroundColor = "rgba(255, 0, 0, 0.452)"
+            return;
+        } else {
+            Allfields[field.dataset.login] = field.value
+            field.style.backgroundColor = ""
+            
+        }
+    })
+    console.log(Allfields);
+    fetch("login.php", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(Allfields)
+    })
+    .then(response => response.json()) 
+    .then(data => {
+        let jsonData = data;
+        console.log(jsonData);
+        if (jsonData.success) {
+            element.style.display = "none";
+            alert(jsonData.success); 
+        } else {
+            element.style.display = "block";
+            element.textContent = jsonData.error;
+        }
+    })
+    .catch(error => console.error("Error:", error));
+})
