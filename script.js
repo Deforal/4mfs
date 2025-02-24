@@ -1,3 +1,25 @@
+function checkLoginStatus() {
+    fetch("auth.php")
+        .then(response => response.json())
+        .then(data => {
+            console.log("Auth status:", data);
+            if (data.loggedIn) {
+                document.getElementById("login-link").innerText = `Welcome, ${data.user.name}`;
+                document.getElementById("login-link").href = "PA.html";
+
+                if (data.user.role === "admin") {
+                    document.getElementById("admin-panel").style.display = "block";
+                }
+            } else {
+                document.getElementById("login-link").innerText = "Login";
+                document.getElementById("admin-panel").style.display = "none";
+            }
+        })
+        .catch(error => console.error("Error checking login status:", error));
+}
+
+// Run on page load
+document.addEventListener("DOMContentLoaded", checkLoginStatus);
 function header() {
     const header = document.querySelectorAll(".header_mass")
     header.forEach(element => {
@@ -237,6 +259,7 @@ document.getElementById("reg_form").addEventListener('submit', function(event) {
         if (jsonData.success) {
             element.style.display = "none";
             alert(jsonData.success); 
+            window.location.href = "PA.html"
         } else {
             element.style.display = "block";
             element.textContent = jsonData.error;
@@ -248,7 +271,7 @@ document.getElementById("log_form").addEventListener('submit', function(event) {
     event.preventDefault()
     const fields = document.querySelectorAll ('[data-login]')
     const Allfields = {}
-    const element = document.querySelector(".form_error")
+    const element = document.querySelectorAll(".form_error")[1]
     fields.forEach(field => {
         if (field.value == '') {
             field.style.backgroundColor = "rgba(255, 0, 0, 0.452)"
@@ -274,6 +297,7 @@ document.getElementById("log_form").addEventListener('submit', function(event) {
         if (jsonData.success) {
             element.style.display = "none";
             alert(jsonData.success); 
+            window.location.href = "PA.html"
         } else {
             element.style.display = "block";
             element.textContent = jsonData.error;
