@@ -1,18 +1,14 @@
+let loggedIn
 function checkLoginStatus() {
     fetch("auth.php")
         .then(response => response.json())
         .then(data => {
             console.log("Auth status:", data);
             if (data.loggedIn) {
-                document.getElementById("login-link").innerText = `Welcome, ${data.user.name}`;
-                document.getElementById("login-link").href = "PA.html";
-
+                loggedIn = "user"
                 if (data.user.role === "admin") {
-                    document.getElementById("admin-panel").style.display = "block";
+                    loggedIn = "admin"
                 }
-            } else {
-                document.getElementById("login-link").innerText = "Login";
-                document.getElementById("admin-panel").style.display = "none";
             }
         })
         .catch(error => console.error("Error checking login status:", error));
@@ -30,20 +26,34 @@ function header() {
             </div>
             <nav class="top__nav">
             `
-            if (element.dataset.header == "Login") {
-                content += `
-                <a href="catagories.html" class="top__nav_category">Категории</a>
-                `
-            } else if (element.dataset.header == "categories") {
-                content +=`
-                <a href="Login_form.html" class="top__nav_sales">Вход/Регистрация</a>
-                `
+            if (loggedIn) {
+                if (element.dataset.header == "categories") {
+                    content +=`
+                    <a href="Login_form.html" class="top__nav_sales">Вход/Регистрация</a>
+                    `
+                } else {
+                    content +=`
+                    <a href="catagories.html" class="top__nav_category">Категории</a>
+                    <a href="PA.html" class="top__nav_sales">Личный кабинет</a>
+                    `
+                }
             } else {
-                content +=`
-                <a href="catagories.html" class="top__nav_category">Категории</a>
-                <a href="Login_form.html" class="top__nav_sales">Вход/Регистрация</a>
-                `
+                if (element.dataset.header == "Login") {
+                    content += `
+                    <a href="catagories.html" class="top__nav_category">Категории</a>
+                    `
+                } else if (element.dataset.header == "categories") {
+                    content +=`
+                    <a href="Login_form.html" class="top__nav_sales">Вход/Регистрация</a>
+                    `
+                } else {
+                    content +=`
+                    <a href="catagories.html" class="top__nav_category">Категории</a>
+                    <a href="Login_form.html" class="top__nav_sales">Вход/Регистрация</a>
+                    `
+                }
             }
+            
         content += `</nav> </div>`
         element.innerHTML += content
     });
