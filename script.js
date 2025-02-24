@@ -59,7 +59,7 @@ function sales() {
     .then(result => {
         const container = document.getElementById('categories__grid');
         let htmlInner = '';
-        htmlInner += '<section class="item_grid bottom_margin_123px center">';
+        htmlInner += '<section class="categories__grid bottom_margin_123px center">';
         const filteredData = result.filter(item => item.Special_price != null)
         filteredData.forEach(item => {
         htmlInner += `
@@ -109,8 +109,8 @@ function categories() {
         console.log(array)
         array.forEach(item => {
             count = 0
-            htmlInner += `<h2 class="categories_section_header center" id="${item}_categories">${item}</h2>`;
-            htmlInner += '<section class="item_grid bottom_margin_123px center">'; // Start new section
+            htmlInner += `<h2 class="categories__section_header center" id="${item}_categories">${item}</h2>`;
+            htmlInner += '<section class="categories__grid bottom_margin_123px center">'; // Start new section
             while (count < result.length - 1) {
                 if (item == result[count].Category) {
                     if (result[count].Special_price !== null) {
@@ -177,7 +177,7 @@ function sortByPrice() {
 
         // Build HTML to display sorted items
         const container = document.getElementById('categories__grid');
-        let htmlInner = '<section class="item_grid bottom_margin_123px center">'; // Start new section
+        let htmlInner = '<section class="categories__grid bottom_margin_123px center">'; // Start new section
         items.forEach(item => {
             htmlInner += `
             <div class="item_div">
