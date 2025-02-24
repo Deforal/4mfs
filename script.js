@@ -1,13 +1,17 @@
-let loggedIn
-function checkLoginStatus() {
-    fetch("auth.php")
+let logg
+function checkAuthStatus() {
+    return fetch("./php/auth.php")
         .then(response => response.json())
         .then(data => {
             console.log("Auth status:", data);
             if (data.loggedIn) {
-                loggedIn = "user"
+                logg = "user"
+                document.getElementById("username").textContent = data.user.name;
+                document.getElementById("email").textContent = data.user.email;
+                document.getElementById("phone").textContent = data.user.phone;
                 if (data.user.role === "admin") {
-                    loggedIn = "admin"
+                    logg = "admin"
+                    document.getElementById("adminSection").classList.remove("hidden");
                 }
             }
         })
@@ -15,10 +19,22 @@ function checkLoginStatus() {
 }
 
 // Run on page load
-document.addEventListener("DOMContentLoaded", checkLoginStatus);
+
 function header() {
-    const header = document.querySelectorAll(".header_mass")
-    header.forEach(element => {
+    const header = document.querySelector("header")
+    if (header.classList == "header") {
+        header.innerHTML = `<div class="top">
+        <div class="top__logo">
+            <a href="main.html"><img src="img/layer1.svg" alt=""></a>
+        </div>
+        <nav class="top__nav">
+            <a href="catagories.html" class="top__nav_category">Категории</a>
+            <a href="${logg ? "PA.html" : "Login_form.html"}" class="top__nav_sales">
+                ${logg ? "Личный кабинет" : "Вход/Регистрация"}
+            </a>
+        </nav>
+        </div>`
+    } else {
         let content = `
         <div class="top_else">
             <div class="top__logo">
@@ -26,37 +42,30 @@ function header() {
             </div>
             <nav class="top__nav">
             `
-            if (loggedIn) {
-                if (element.dataset.header == "categories") {
-                    content +=`
-                    <a href="Login_form.html" class="top__nav_sales">Вход/Регистрация</a>
-                    `
-                } else {
-                    content +=`
-                    <a href="catagories.html" class="top__nav_category">Категории</a>
-                    <a href="PA.html" class="top__nav_sales">Личный кабинет</a>
-                    `
-                }
-            } else {
-                if (element.dataset.header == "Login") {
-                    content += `
-                    <a href="catagories.html" class="top__nav_category">Категории</a>
-                    `
-                } else if (element.dataset.header == "categories") {
-                    content +=`
-                    <a href="Login_form.html" class="top__nav_sales">Вход/Регистрация</a>
-                    `
-                } else {
-                    content +=`
-                    <a href="catagories.html" class="top__nav_category">Категории</a>
-                    <a href="Login_form.html" class="top__nav_sales">Вход/Регистрация</a>
-                    `
-                }
+            if (header.dataset.header == "Login") {
+                content += `
+                <a href="catagories.html" class="top__nav_category">Категории</a>
+                `
+            } else if (header.dataset.header == "categories") {
+                content +=`
+                <a href="${logg ? "PA.html" : "Login_form.html"}" class="top__nav_sales">
+                ${logg ? "Личный кабинет" : "Вход/регистрация"}
+                </a>
+                `
+            }  else {
+                content +=`
+                <a href="catagories.html" class="top__nav_category">Категории</a>
+                <a href="${logg ? "PA.html" : "Login_form.html"}" class="top__nav_sales">
+                    ${logg ? "Личный кабинет" : "Вход/Регистрация"}
+                </a>
+                `
             }
             
         content += `</nav> </div>`
-        element.innerHTML += content
-    });
+        header.innerHTML += content
+    }
+    
+    
 }
 function footer() {
     const footer = document.querySelectorAll(".footer")
@@ -76,12 +85,14 @@ function footer() {
         </nav>`
     });
 }
-document.addEventListener('DOMContentLoaded', () => {
-    header()
-    footer()
+checkAuthStatus().then(() => {
+    console.log(logg);
+    header();
+    footer();
 })
+    
 function sales() {
-    fetch('data.php')
+    fetch('./php/data.php')
     .then(response => {
         if (!response.ok) {
             throw new Error('Network response was not ok ' + response.statusText);
@@ -116,7 +127,7 @@ function sales() {
     
 }
 function categories() {
-    fetch('data.php')
+    fetch('./php/data.php')
     .then(response => {
         if (!response.ok) {
             throw new Error('Network response was not ok ' + response.statusText);
@@ -186,7 +197,7 @@ function categories() {
 let price_switch = 1; // 1 for ascending, 0 for descending
 
 function sortByPrice() {
-    fetch('data.php')
+    fetch('./php/data.php')
     .then(response => {
         if (!response.ok) {
             throw new Error('Network response was not ok ' + response.statusText);
@@ -255,7 +266,7 @@ document.getElementById("reg_form").addEventListener('submit', function(event) {
         element.style.display = "none"
     }
     delete Allfields.Rpassword;
-    fetch("register.php", {
+    fetch("./php/register.php", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -293,7 +304,7 @@ document.getElementById("log_form").addEventListener('submit', function(event) {
         }
     })
     console.log(Allfields);
-    fetch("login.php", {
+    fetch("./php/login.php", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -315,3 +326,64 @@ document.getElementById("log_form").addEventListener('submit', function(event) {
     })
     .catch(error => console.error("Error:", error));
 })
+document.addEventListener("DOMContentLoaded", () => {
+    checkAuthStatus().then(userData => {
+        if (userData.loggedIn) {
+            document.getElementById("username").textContent = userData.user.name;
+            document.getElementById("userEmail").textContent = userData.user.email;
+            document.getElementById("userPhone").textContent = userData.user.phone;
+
+            if (userData.user.role === "admin") {
+                document.getElementById("adminPanel").classList.remove("hidden");
+            }
+        } else {
+            window.location.href = "Login_form.html";
+        }
+    }).catch(error => console.error("Ошибка проверки авторизации:", error));
+});
+document.addEventListener("DOMContentLoaded", () => {
+    let fieldToUpdate = ""; 
+
+    function showForm(field) {
+        fieldToUpdate = field;
+        console.log("Updating:", fieldToUpdate);
+    }
+
+    // Ensure event listeners are correctly set
+    document.querySelectorAll(".edit-link").forEach(link => {
+        link.addEventListener("click", (event) => {
+            event.preventDefault();
+            showForm(event.target.dataset.field);
+        });
+    });
+});
+
+function hideForm() {
+    document.getElementById("editForm").classList.add("hidden");
+}
+
+function updateInfo() {
+    const newValue = document.getElementById("newValue").value;
+    fetch("php/updateUser.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ field: fieldToUpdate, value: newValue })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            document.getElementById(`user${fieldToUpdate.charAt(0).toUpperCase() + fieldToUpdate.slice(1)}`).textContent = newValue;
+            hideForm();
+        } else {
+            alert("Ошибка обновления данных!");
+        }
+    })
+    .catch(error => console.error("Ошибка:", error));
+}
+
+function checkAuthStatus() {
+    return fetch("./php/auth.php")
+        .then(response => response.json())
+        .then(data => data)
+        .catch(error => console.error("Ошибка проверки авторизации:", error));
+}

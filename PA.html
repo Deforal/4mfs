@@ -8,13 +8,59 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <header class="header_mass" data-header="PA">
+    <header class="header_mass" data-header="Login">
     </header>
     <Main>
     <div class="bread_crumbs bread_crumbs_withbd">
         <a href="main.html">Главная</a>
         <p>/ Личный кабинет</p>
     </div>
+    <section class="PA__top">
+        <div class="PA__top_div">
+            <h1>Добро пожаловать, <span id="username">...</span></h1>
+            <button onclick="window.location.href='./php/logout.php'" class="PA__logout">Выйти из профиля</button>
+        </div>
+        <div class="PA__top_div">
+            <p>Ваша почта: <span id="userEmail">пп****пп@gg.g</span> [<a href="#" onclick="showForm('email')">изменить</a>]</p>
+            <p>Пароль: [<a href="#" onclick="showForm('password')">изменить</a>]</p>
+            <p>Телефон: <span id="userPhone">+7**********</span> [<a href="#" onclick="showForm('phone')">изменить</a>]</p>
+        </div>
+        <div id="adminPanel" class="hidden">
+            <h2>Панель администратора</h2>
+            <p>Здесь будет функционал только для админов.</p>
+        </div>
+    </section>
+    
+   
+    <section class="PA__cart center">
+        <h1>Корзина</h1>
+        <section class="cart">
+            <div class="cart__item">
+                <div class="cart__item_left">
+                    <img src="./img/Gainer/3.jpg" alt="gggg">
+                    <div class="cart__item_left_column">
+                        <p>Название</p>
+                        <p>Количество</p>
+                        <p>Цена</p>
+                    </div>
+                </div>
+                <div class="cart__item_right">
+                    <p class="cart__item_description">Описание</p>
+                    <p class="cart__item_overall">Итого:</p>
+                </div>
+            </div>
+        </section>
+
+        
+    </section>
+    <section class="PA__history center">
+        <h1>Ваши прошлые заказы</h1>
+        <section>
+
+        </section>
+            
+        
+    </section>
     
     </Main>
     <footer class="footer">

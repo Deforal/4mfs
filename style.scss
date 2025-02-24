@@ -1,6 +1,7 @@
 * {
     margin: 0;
     padding: 0;
+    font-family: 'Montserrat' !important;
 }
 $grenc: 5E8A62;
 p {
@@ -698,6 +699,95 @@ section.main_bottom p {
         transition: all 0.2s;
         &:active {
             transform: scale(1.05);
+        }
+    }
+}
+.PA {
+    &__logout {
+        padding: 10px;
+        background: #5E8A62;
+        border-radius: 15px;
+        color: #FFFFFF;
+        font-style: normal;
+        font-weight: 500;
+        font-size: 30px;
+        line-height: 37px;
+        width: 300px;
+        transition: all 0.2s;
+        &:active {
+            transform: scale(1.05);
+        }
+    }
+    &__top {
+        box-sizing: border-box;
+        padding-top: 36px;
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 48px;
+        background-color: #8e8e8e2d;
+        margin-left: calc(50% - 600px);
+        margin-right: calc(50% - 600px);
+        border-radius: 10%;
+        &_div {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        & h1 {
+            font-size: 32px;
+        }
+    }
+    &__cart{
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        padding-top: 48px;
+    }
+    &__history{
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        & section {
+            border-top: 3px solid #000;
+        }
+    }
+}
+.cart {
+    border-top: 3px solid #000;
+    &__item {
+        box-sizing: border-box;
+        padding-top: 32px;
+        padding-bottom: 32px;
+        display: flex;
+        justify-content: space-between;
+        border-bottom: 4px solid #000;
+        &_left {
+            display: flex;
+            justify-content: left;
+            gap: 48px;
+            width: 45%;
+            &_column {
+                padding-left: 10px;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                border-left: 8px double black;
+            }
+        }
+        &_right {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 55%;
+        }
+        &_description {
+            padding-left: 10px;
+        }
+        &_overall {
+            padding: 10px;
+            border-radius: 10px;
+            background-color: #8e8e8e2d;
         }
     }
 }
