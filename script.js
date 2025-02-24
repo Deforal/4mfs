@@ -6,12 +6,8 @@ function checkAuthStatus() {
             console.log("Auth status:", data);
             if (data.loggedIn) {
                 logg = "user"
-                document.getElementById("username").textContent = data.user.name;
-                document.getElementById("email").textContent = data.user.email;
-                document.getElementById("phone").textContent = data.user.phone;
                 if (data.user.role === "admin") {
                     logg = "admin"
-                    document.getElementById("adminSection").classList.remove("hidden");
                 }
             }
         })
@@ -326,64 +322,3 @@ document.getElementById("log_form").addEventListener('submit', function(event) {
     })
     .catch(error => console.error("Error:", error));
 })
-document.addEventListener("DOMContentLoaded", () => {
-    checkAuthStatus().then(userData => {
-        if (userData.loggedIn) {
-            document.getElementById("username").textContent = userData.user.name;
-            document.getElementById("userEmail").textContent = userData.user.email;
-            document.getElementById("userPhone").textContent = userData.user.phone;
-
-            if (userData.user.role === "admin") {
-                document.getElementById("adminPanel").classList.remove("hidden");
-            }
-        } else {
-            window.location.href = "Login_form.html";
-        }
-    }).catch(error => console.error("Ошибка проверки авторизации:", error));
-});
-document.addEventListener("DOMContentLoaded", () => {
-    let fieldToUpdate = ""; 
-
-    function showForm(field) {
-        fieldToUpdate = field;
-        console.log("Updating:", fieldToUpdate);
-    }
-
-    // Ensure event listeners are correctly set
-    document.querySelectorAll(".edit-link").forEach(link => {
-        link.addEventListener("click", (event) => {
-            event.preventDefault();
-            showForm(event.target.dataset.field);
-        });
-    });
-});
-
-function hideForm() {
-    document.getElementById("editForm").classList.add("hidden");
-}
-
-function updateInfo() {
-    const newValue = document.getElementById("newValue").value;
-    fetch("php/updateUser.php", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ field: fieldToUpdate, value: newValue })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            document.getElementById(`user${fieldToUpdate.charAt(0).toUpperCase() + fieldToUpdate.slice(1)}`).textContent = newValue;
-            hideForm();
-        } else {
-            alert("Ошибка обновления данных!");
-        }
-    })
-    .catch(error => console.error("Ошибка:", error));
-}
-
-function checkAuthStatus() {
-    return fetch("./php/auth.php")
-        .then(response => response.json())
-        .then(data => data)
-        .catch(error => console.error("Ошибка проверки авторизации:", error));
-}
