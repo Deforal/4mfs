@@ -722,7 +722,7 @@ section.main_bottom p {
   background-color: rgba(142, 142, 142, 0.1764705882);
   margin-left: calc(50% - 600px);
   margin-right: calc(50% - 600px);
-  border-radius: 10%;
+  border-radius: 30px;
 }
 .PA__top_div {
   display: flex;
@@ -784,4 +784,13 @@ section.main_bottom p {
   padding: 10px;
   border-radius: 10px;
   background-color: rgba(142, 142, 142, 0.1764705882);
+}
+
+.admin_panel {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.admin_panel h2 {
+  text-align: center;
 }/*# sourceMappingURL=style.css.map */

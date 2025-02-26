@@ -15,6 +15,7 @@ function checkAuthStatus() {
                 if (data.user.role == "1") {
                     logg = "admin"
                     document.getElementById("adminPanel").classList.remove("hidden");
+                    showAdminPanel();
                 }
             }
         })
@@ -87,6 +88,155 @@ function updateUser(field) {
     });
 }
 
+function showAdminPanel() {
+    fetch("./php/data.php")
+        .then(response => response.json())
+        .then(products => {
+            const adminPanel = document.getElementById("adminPanel");
+            adminPanel.innerHTML = `
+                <h2>Админ панель</h2>
+                <table border="1">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Название</th>
+                            <th>Особая цена</th>
+                            <th>Цена</th>
+                            <th>Описание</th>
+                            <th>Категория</th>
+                            <th>Удалить</th>
+                        </tr>
+                    </thead>
+                    <tbody id="productTableBody"></tbody>
+                </table>
+                <button onclick="addProduct()">Добавить товар</button>
+            `;
+
+            const tableBody = document.getElementById("productTableBody");
+
+            products.forEach(product => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${product.id}</td>
+                    <td contenteditable="true" onblur="editProduct(${product.id}, 'Name', this)">${product.Name}</td>
+                    <td contenteditable="true" onblur="editProduct(${product.id}, 'Special_price', this)">
+                        ${product.Special_price ? product.Special_price : "No sale"}
+                    </td>
+                    <td contenteditable="true" onblur="editProduct(${product.id}, 'Price', this)">${product.Price}</td>
+                    <td contenteditable="true" onblur="editProduct(${product.id}, 'Desciption', this)">${product.Desciption}</td>
+                    <td contenteditable="true" onblur="editProduct(${product.id}, 'Category', this)">${product.Category}</td>
+                    <td>
+                        <button onclick="deleteProduct(${product.id})">Delete</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+
+            adminPanel.classList.remove("hidden");
+        })
+        .catch(error => console.error("Error fetching products:", error));
+}
+
+function deleteProduct(id) {
+    if (!confirm("Are you sure you want to delete this product?")) return;
+
+    fetch("./php/delete_product.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: id })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert("Product deleted");
+            showAdminPanel();
+        } else {
+            alert("Error: " + data.error);
+        }
+    })
+    .catch(error => console.error("Error deleting product:", error));
+}
+
+
+
+function addProduct() {
+    const name = prompt("Enter product name:");
+    if (!name) return;
+
+    const specialPrice = prompt("Enter special price (leave empty for no sale):");
+    const price = prompt("Enter price:");
+    if (!price || isNaN(price)) {
+        alert("Invalid price.");
+        return;
+    }
+
+    const desc = prompt("Enter description:");
+    const category = prompt("Enter category:");
+
+    fetch("./php/add_product.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            name: name,
+            special_price: specialPrice || null,
+            price: parseFloat(price),
+            desc: desc,
+            category: category
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert("Product added");
+            showAdminPanel();
+        } else {
+            alert("Error: " + data.error);
+        }
+    })
+    .catch(error => console.error("Error adding product:", error));
+}
+
+
+function editProduct(id, field, element) {
+    const newValue = element.textContent.trim();
+
+    fetch("./php/edit_product.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, field, value: newValue })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            console.error("Error editing product:", data.error);
+            alert("Ошибка: " + data.error);
+        } else {
+            console.log("Product updated:", data.success);
+        }
+    })
+    .catch(error => console.error("Fetch error:", error));
+}
+
+
+function deleteProduct(id) {
+    if (!confirm("Вы уверены, что хотите удалить этот продукт?")) return;
+
+    fetch("./php/admin_actions.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "delete", id })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert("Продукт удалён!");
+            document.getElementById(`product-${id}`).remove();
+        } else {
+            alert(data.error);
+        }
+    })
+    .catch(error => console.error("Ошибка удаления товара:", error));
+}
 
 function header() {
     const header = document.querySelector("header")

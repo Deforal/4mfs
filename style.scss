@@ -728,7 +728,7 @@ section.main_bottom p {
         background-color: #8e8e8e2d;
         margin-left: calc(50% - 600px);
         margin-right: calc(50% - 600px);
-        border-radius: 10%;
+        border-radius: 30px;
         &_div {
             display: flex;
             justify-content: space-between;
@@ -789,5 +789,13 @@ section.main_bottom p {
             border-radius: 10px;
             background-color: #8e8e8e2d;
         }
+    }
+}
+.admin_panel {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    & h2 {
+        text-align: center;
     }
 }
