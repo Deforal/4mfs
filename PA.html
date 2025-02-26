@@ -21,13 +21,11 @@
             <button onclick="window.location.href='./php/logout.php'" class="PA__logout">Выйти из профиля</button>
         </div>
         <div class="PA__top_div">
-            <p>Ваша почта: <span id="userEmail">пп****пп@gg.g</span> [<a href="#" onclick="showForm('email')">изменить</a>]</p>
-            <p>Пароль: [<a href="#" onclick="showForm('password')">изменить</a>]</p>
-            <p>Телефон: <span id="userPhone">+7**********</span> [<a href="#" onclick="showForm('phone')">изменить</a>]</p>
+            <p>Ваша почта: <span id="userEmail">пп****пп@gg.g</span> <button class="edit-btn" data-field="Email">изменить</button></p>
+            <p>Телефон: <span id="userPhone">+7**********</span> <button class="edit-btn" data-field="Phone">изменить</button></p>
         </div>
         <div id="adminPanel" class="hidden">
-            <h2>Панель администратора</h2>
-            <p>Здесь будет функционал только для админов.</p>
+                    
         </div>
     </section>
     

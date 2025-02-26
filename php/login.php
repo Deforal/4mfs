@@ -34,7 +34,7 @@ if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
 }
 
 // Get user from database
-$stmt = $conn->prepare("SELECT ID, Name, Password, Role FROM Users WHERE Email = ?");
+$stmt = $conn->prepare("SELECT ID, Name, Password, Role, Email, Phone FROM Users WHERE Email = ?");
 $stmt->bind_param("s", $email);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -45,6 +45,8 @@ if ($row = $result->fetch_assoc()) {
         $_SESSION["user_id"] = $row["ID"];
         $_SESSION["user_name"] = $row["Name"];
         $_SESSION["role"] = $row["Role"];
+        $_SESSION["phone"] =$row['Phone'];
+        $_SESSION["email"] =$row['Email'];
 
         echo json_encode([
             "success" => "Вы вошли",

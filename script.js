@@ -1,3 +1,4 @@
+"use strict";
 let logg
 function checkAuthStatus() {
     return fetch("./php/auth.php")
@@ -5,16 +6,87 @@ function checkAuthStatus() {
         .then(data => {
             console.log("Auth status:", data);
             if (data.loggedIn) {
-                logg = "user"
-                if (data.user.role === "admin") {
+                logg = "user";
+                document.getElementById("username").textContent = data.user.name;
+                document.getElementById("userEmail").textContent = data.user.email;
+                const phone = document.getElementById("userPhone");
+                data.user.phone ? phone.textContent = data.user.phone : phone.textContent = "Номера телефона не прикреплен"
+                
+                if (data.user.role == "1") {
                     logg = "admin"
+                    document.getElementById("adminPanel").classList.remove("hidden");
                 }
             }
         })
         .catch(error => console.error("Error checking login status:", error));
 }
 
-// Run on page load
+document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll(".edit-btn").forEach(button => {
+        button.addEventListener("click", () => showForm(button.dataset.field));
+    });
+});
+
+function showForm(field) {
+    let fieldSpan = document.getElementById(`user${field}`);
+    if (!fieldSpan) return;
+
+    let currentValue = fieldSpan.textContent.trim();
+    let formContainer = fieldSpan.parentElement;
+    
+    formContainer.innerHTML = `
+        <span id="user${field}">
+            <input type="text" id="new${field}" value="${currentValue == "Номера телефона не прикреплен" ? "" : currentValue}">
+        </span>
+        <button onclick="updateUser('${field}')">Сохранить</button>
+        <button onclick="cancelEdit('${field}', '${currentValue}')">Отмена</button>
+    `;
+}
+
+function cancelEdit(field, originalValue) {
+    let formContainer = document.getElementById(`user${field}`).parentElement;
+    let string = "";
+    field == "Email" ? string += "Ваша почта:" : string += "Телефон: ";
+    string += `
+        <span id="user${field}">${originalValue}</span> 
+        <button class="edit-btn" data-field="${field}">изменить</button>
+    `;
+    formContainer.innerHTML = string;
+    // Rebind event listener to new button
+    formContainer.querySelector(".edit-btn").addEventListener("click", () => showForm(field));
+}
+
+function updateUser(field) {
+    let inputField = document.getElementById(`new${field}`);
+    if (!inputField) {return;}
+
+    let newValue = inputField.value.trim();
+    if (!newValue) {
+        alert("Поле не может быть пустым.");
+        return;
+    }
+
+    fetch("./php/update_user.php", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ field: field, value: newValue })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            cancelEdit(field, data.newValue); // Update UI with new value
+        } else {
+            alert(data.error);
+        }
+    })
+    .catch(error => {
+        console.error("Ошибка:", error);
+        alert("Произошла ошибка. Попробуйте еще раз.");
+    });
+}
+
 
 function header() {
     const header = document.querySelector("header")
