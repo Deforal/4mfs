@@ -217,27 +217,6 @@ function editProduct(id, field, element) {
     .catch(error => console.error("Fetch error:", error));
 }
 
-
-function deleteProduct(id) {
-    if (!confirm("Вы уверены, что хотите удалить этот продукт?")) return;
-
-    fetch("./php/admin_actions.php", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "delete", id })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            alert("Продукт удалён!");
-            document.getElementById(`product-${id}`).remove();
-        } else {
-            alert(data.error);
-        }
-    })
-    .catch(error => console.error("Ошибка удаления товара:", error));
-}
-
 function header() {
     const header = document.querySelector("header")
     if (header.classList == "header") {
