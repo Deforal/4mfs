@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: 127.0.0.1:3306
--- Время создания: Фев 26 2025 г., 16:23
+-- Время создания: Мар 05 2025 г., 08:32
 -- Версия сервера: 8.0.30
 -- Версия PHP: 7.2.34
 
@@ -42,9 +42,24 @@ CREATE TABLE `Feedback` (
 --
 
 CREATE TABLE `Offers` (
+  `Offer_id` int NOT NULL,
   `Product_id` int NOT NULL,
-  `User_id` int NOT NULL
+  `User_id` int NOT NULL,
+  `Stage` varchar(20) COLLATE utf8mb4_general_ci NOT NULL,
+  `Count` int NOT NULL DEFAULT '1'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Дамп данных таблицы `Offers`
+--
+
+INSERT INTO `Offers` (`Offer_id`, `Product_id`, `User_id`, `Stage`, `Count`) VALUES
+(1, 2, 15, 'в корзине', 4),
+(9, 1, 15, 'в корзине', 1),
+(10, 3, 15, 'в корзине', 1),
+(11, 4, 15, 'в корзине', 1),
+(12, 5, 15, 'в корзине', 1),
+(13, 6, 15, 'в корзине', 1);
 
 -- --------------------------------------------------------
 
@@ -162,6 +177,7 @@ ALTER TABLE `Feedback`
 -- Индексы таблицы `Offers`
 --
 ALTER TABLE `Offers`
+  ADD PRIMARY KEY (`Offer_id`),
   ADD KEY `Product_id` (`Product_id`),
   ADD KEY `User_id` (`User_id`);
 
@@ -186,6 +202,12 @@ ALTER TABLE `Users`
 --
 ALTER TABLE `Feedback`
   MODIFY `id` int NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT для таблицы `Offers`
+--
+ALTER TABLE `Offers`
+  MODIFY `Offer_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT для таблицы `Products`

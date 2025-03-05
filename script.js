@@ -300,7 +300,7 @@ function addToCart() {
                 fetch("./php/add_offer.php", {
                     method: "POST",
                     headers: {"Content-Type":"application/JSON"},
-                    body: JSON.stringify(buttonEl.dataset.itemid)
+                    body: JSON.stringify(parseInt(buttonEl.dataset.itemid, 10))
                 }).catch(error => {
                     console.log("Error: " + error);
                 })
@@ -331,7 +331,7 @@ async function renderCart() {
         let productCount = {};
         cartData.data.forEach(cartItem => {
             const id = cartItem.Product_id;
-            productCount[id] = (productCount[id] || 0) + 1;
+            productCount[id] = cartItem.Count;
         });
         console.log("Product Count:", productCount);
         
@@ -365,7 +365,6 @@ async function renderCart() {
                 </div>
             </div>`
         })
-        console.log(htmlInner);
         const cartDiv = document.querySelector(".cart");
         cartDiv.innerHTML = htmlInner;
         console.log("Matched Products:", matchedProducts);
