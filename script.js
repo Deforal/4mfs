@@ -318,7 +318,6 @@ async function renderCart() {
             return;
         }
         const cartData = await response.json();
-        console.log(cartData.data);
 
         const response1 = await fetch("./php/data.php");
         if (!response1.ok) {
@@ -326,14 +325,12 @@ async function renderCart() {
             return;
         }
         const productsData = await response1.json();
-        console.log(productsData);
 
         let productCount = {};
         cartData.data.forEach(cartItem => {
             const id = cartItem.Product_id;
             productCount[id] = cartItem.Count;
         });
-        console.log("Product Count:", productCount);
         
         // Step 2: Filter unique products from productsData
         let matchedProducts = productsData
@@ -358,8 +355,8 @@ async function renderCart() {
                 <div class="cart__item_right">
                     <p class="cart__item_description">Описание: ${item.Description || "Описание товара отсутствует"}</p>
                     <div class="cart__item_order">
-                        
-                        <button>Заказать</button>
+                        <button onclick=orderCart(${item.id})>Заказать</button>
+                        <button onclick=delete_itemCart(${item.id})>Удалить</button>
                     </div>
                     
                 </div>
@@ -367,13 +364,40 @@ async function renderCart() {
         })
         const cartDiv = document.querySelector(".cart");
         cartDiv.innerHTML = htmlInner;
-        console.log("Matched Products:", matchedProducts);
         
     } catch (error) {
         console.log("Error: " + error);
     }
 }
 
+async function orderCart(id) {
+    try {
+        const ordering = await fetch("./php/order_cart.php", {
+            method: "POST",
+            headers: {"Content-Type":"application/JSON"},
+            body: JSON.stringify(id)
+        })
+        const success = await ordering.json();
+        success.success == true ? alert("Заказ оформлен") : alert(success.error)
+        renderCart();
+    } catch (error) {
+        console.log("Error" + error);
+    }
+}
+
+async function delete_itemCart(id) {
+    try {
+        const ordering = await fetch("./php/delete_itemCart.php", {
+            method: "POST",
+            headers: {"Content-Type":"application/JSON"},
+            body: JSON.stringify(id)
+        })
+        const success = await ordering.json();
+        renderCart();
+    } catch (error) {
+        console.log("Error" + error);
+    }
+}
     
 function sales() {
     fetch('./php/data.php')
