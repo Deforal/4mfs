@@ -282,11 +282,99 @@ function footer() {
         </nav>`
     });
 }
+
 checkAuthStatus().then(() => {
-    console.log(logg);
     header();
     footer();
+    renderCart();
 })
+
+function addToCart() {
+    const itemDivs = document.querySelectorAll(".item_div")
+    itemDivs.forEach(div => {
+        const buttonEl = div.querySelector(".add_to_cart");
+        buttonEl.addEventListener("click", function () {
+            if (!logg) {
+                alert("Нужно войти")
+            } else(
+                fetch("./php/add_offer.php", {
+                    method: "POST",
+                    headers: {"Content-Type":"application/JSON"},
+                    body: JSON.stringify(buttonEl.dataset.itemid)
+                }).catch(error => {
+                    console.log("Error: " + error);
+                })
+            )            
+        })
+        
+    });
+}
+
+async function renderCart() {
+    try {
+        const response = await fetch("./php/get_cart.php");
+        if (!response.ok) {
+            console.log("Response wasn't okay: " + response.statusText);
+            return;
+        }
+        const cartData = await response.json();
+        console.log(cartData.data);
+
+        const response1 = await fetch("./php/data.php");
+        if (!response1.ok) {
+            console.log("Response wasn't okay: " + response1.statusText);
+            return;
+        }
+        const productsData = await response1.json();
+        console.log(productsData);
+
+        let productCount = {};
+        cartData.data.forEach(cartItem => {
+            const id = cartItem.Product_id;
+            productCount[id] = (productCount[id] || 0) + 1;
+        });
+        console.log("Product Count:", productCount);
+        
+        // Step 2: Filter unique products from productsData
+        let matchedProducts = productsData
+            .filter(product => productCount[product.id]) // Keep only those in the cart
+            .map(product => ({
+                ...product, // Keep product details
+                count: productCount[product.id] // Attach count from cart
+            }));
+        let htmlInner = "";
+        matchedProducts.forEach(item => {
+            htmlInner += `
+            <div class="cart__item" data-cartProduct = "${item.id}">
+                <div class="cart__item_left">
+                    <img src="./img/${item.Img_name}" alt="${item.Name}">
+                    <div class="cart__item_left_column">
+                        <p>Название: ${item.Name}</p>
+                        <p>Количество: ${item.count}</p>
+                        <p>Цена: ${item.Special_price || item.Price} руб.</p>
+                        <p class="cart__item_overall">Итого: ${item.count * (item.Special_price || item.Price)} руб.</p>
+                    </div>
+                </div>
+                <div class="cart__item_right">
+                    <p class="cart__item_description">Описание: ${item.Description || "Описание товара отсутствует"}</p>
+                    <div class="cart__item_order">
+                        
+                        <button>Заказать</button>
+                    </div>
+                    
+                </div>
+            </div>`
+        })
+        console.log(htmlInner);
+        const cartDiv = document.querySelector(".cart");
+        cartDiv.innerHTML = htmlInner;
+        console.log("Matched Products:", matchedProducts);
+        
+    } catch (error) {
+        console.log("Error: " + error);
+    }
+}
+
     
 function sales() {
     fetch('./php/data.php')
@@ -311,12 +399,13 @@ function sales() {
                         <p class="first_price">${item.Special_price} руб.</p>
                         <p class="second_price">${item.Price} руб</p>
                     </div>
-                    <button class="add_to_cart">В корзину</button>
+                    <button class="add_to_cart" data-itemid = "${item.id}">В корзину</button>
                 </div>
             </div>`
             }) 
         container.innerHTML = htmlInner
         htmlInner += '</section>';
+        addToCart();
     })
     .catch(error => {
         console.error('There was a problem with the fetch operation:', error);
@@ -332,6 +421,7 @@ function categories() {
         return response.json();
     })
     .then(result => {
+        console.log(result);
         const container = document.getElementById('categories__grid');
         let htmlInner = '';
         let currentCategory = '';
@@ -353,30 +443,22 @@ function categories() {
             htmlInner += '<section class="categories__grid bottom_margin_123px center">'; // Start new section
             while (count < result.length - 1) {
                 if (item == result[count].Category) {
+                    htmlInner +=`
+                    <div class="item_div">
+                        <img src="img/${result[count].Img_name}" alt="" class="item_div__img">
+                        <p class="item_name">${result[count].Name}</p>
+                    <div class="price_n_button">`;
                     if (result[count].Special_price !== null) {
-                        htmlInner +=`
-                        <div class="item_div">
-                            <img src="img/${result[count].Img_name}" alt="" class="item_div__img">
-                            <p class="item_name">${result[count].Name}</p>
-                            <div class="price_n_button">
-                                <div>
-                                    <p class="first_price">${result[count].Special_price} руб.</p>
-                                    <p class="second_price">${result[count].Price} руб</p>
-                                </div>
-                                <button class="add_to_cart">В корзину</button>
-                            </div>
-                        </div>`
+                        htmlInner += `<div>
+                            <p class="first_price">${result[count].Special_price} руб.</p>
+                            <p class="second_price">${result[count].Price} руб</p>
+                        </div> `;
                     } else {
-                        htmlInner += `
-                        <div class="item_div">
-                            <img src="img/${result[count].Img_name}" alt="" class="item_div__img">
-                            <p class="item_name">${result[count].Name}</p>
-                            <div class="price_n_button">
-                                <p class="first_price">${result[count].Price} руб.</p>
-                                <button class="add_to_cart">В корзину</button>
-                            </div>
-                        </div>`;
+                        htmlInner += `<p class="first_price">${result[count].Price} руб.</p>`;
                     }
+                    htmlInner +=`<button class="add_to_cart" data-itemid = "${result[count].id}">В корзину</button>
+                    </div>
+                    </div>`;
                 }
                 count++;
             }
@@ -385,6 +467,7 @@ function categories() {
 
         htmlInner += '</section>'; // Close the last section
         container.innerHTML = htmlInner;
+        addToCart();
     })
     .catch(error => {
         console.error('There was a problem with the fetch operation:', error);
@@ -428,12 +511,13 @@ function sortByPrice() {
                         <p class="first_price">${item.Special_price !== null ? item.Special_price : item.Price} руб.</p>
                         ${item.Special_price !== null ? `<p class="second_price">${item.Price} руб</p>` : ''}
                     </div>
-                    <button class="add_to_cart">В корзину</button>
+                    <button class="add_to_cart" data-itemid = "${item.id}">В корзину</button>
                 </div>
             </div>`;
         });
         htmlInner += '</section>'; // Close section
         container.innerHTML = htmlInner;
+        addToCart();
     })
     .catch(error => {
         console.error('There was a problem with the fetch operation:', error);

@@ -1,17 +1,7 @@
 <?php
 header("Content-Type: application/json");
 
-// Database connection
-$servername = "localhost";
-$username = "root";
-$password = ""; // Change this if needed
-$dbname = "ZOP";
-
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-if ($conn->connect_error) {
-    die(json_encode(["error" => "Подключение к датабазе не прошло."]));
-}
+require_once("./connect.php");
 
 // Get JSON data
 $data = json_decode(file_get_contents("php://input"), true);

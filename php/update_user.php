@@ -2,17 +2,7 @@
 header("Content-Type: application/json");
 session_start();
 
-// Database connection
-$servername = "localhost";
-$username = "root";
-$password = ""; // Change this if needed
-$dbname = "ZOP";
-
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-if ($conn->connect_error) {
-    die(json_encode(["error" => "Ошибка подключения к базе данных."]));
-}
+require_once("./connect.php");
 
 // Check if the user is logged in
 if (!isset($_SESSION["user_id"])) {

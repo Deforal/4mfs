@@ -1,19 +1,7 @@
 <?php
-// data.php
 header('Content-Type: application/json'); // Set the content type to JSON
 
-$servername = "localhost";
-$username = "root";
-$password = ""; // No password
-$dbname = "ZOP";
-
-// Create connection
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-// Check connection
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
+require_once("./connect.php");
 
 // Query to fetch data from the Products table
 $sql = "SELECT * FROM Products"; // Ensure that the table name is correct

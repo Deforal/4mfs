@@ -7,16 +7,7 @@ if (!isset($_SESSION["role"]) || $_SESSION["role"] != 1) {
     exit;
 }
 
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "ZOP";
-
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-if ($conn->connect_error) {
-    die(json_encode(["error" => "Database connection failed."]));
-}
+require_once("./connect.php");
 
 $data = json_decode(file_get_contents("php://input"), true);
 if (!isset($data["id"])) {
