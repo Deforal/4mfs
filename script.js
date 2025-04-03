@@ -222,7 +222,7 @@ function header() {
     if (header.classList == "header") {
         header.innerHTML = `<div class="top">
         <div class="top__logo">
-            <a href="main.html"><img src="img/layer1.svg" alt=""></a>
+            <a href="index.html"><img src="img/layer1.svg" alt=""></a>
         </div>
         <nav class="top__nav">
             <a href="catagories.html" class="top__nav_category">Категории</a>
@@ -235,7 +235,7 @@ function header() {
         let content = `
         <div class="top_else">
             <div class="top__logo">
-                <a href="main.html"><img src="img/layer1.svg" alt=""></a>
+                <a href="index.html"><img src="img/layer1.svg" alt=""></a>
             </div>
             <nav class="top__nav">
             `
@@ -262,14 +262,13 @@ function header() {
         header.innerHTML += content
     }
     
-    
 }
 function footer() {
     const footer = document.querySelectorAll(".footer")
     footer.forEach(element => {
         element.innerHTML += `
         <div class="footer__logo">
-        <a href="main.html"><img src="img/layer1.svg" alt=""></a>
+        <a href="index.html"><img src="img/layer1.svg" alt=""></a>
         </div>
         <nav class="footer__nav">
             <div class="footer__nav_links">
@@ -584,7 +583,6 @@ document.getElementById("reg_form").addEventListener('submit', function(event) {
         if (jsonData.success) {
             element.style.display = "none";
             alert(jsonData.success); 
-            window.location.href = "PA.html"
         } else {
             element.style.display = "block";
             element.textContent = jsonData.error;
