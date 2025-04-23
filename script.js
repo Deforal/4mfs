@@ -171,8 +171,6 @@ function deleteProduct(id) {
     .catch(error => console.error("Error deleting product:", error));
 }
 
-
-
 function addProduct() {
     const name = prompt("Enter product name:");
     if (!name) return;
@@ -318,53 +316,83 @@ function change_button(id, element) {
     }
     
 }
-function category_amount() {
+function addToCart() {
     fetch("./php/get_cart.php")
     .then(response => response.json())
     .then(data => {
-        const itemDivs = document.querySelectorAll(".item_div")
+        const cartMap = new Map();
+        data.data.forEach(item => {
+            cartMap.set(String(item.Product_id), item);
+        });
+        const itemDivs = document.querySelectorAll(".item_div");
         itemDivs.forEach(div => {
             const buttonEl = div.querySelector("[data-itemid]");
-            let id = buttonEl.dataset.itemid
-            data.data.forEach(element => {
-                if(element.Product_id == buttonEl.dataset.itemid) {
-                    change_button(buttonEl.dataset.itemid, element) 
-                }
-            });
-        })
+            const itemId = buttonEl?.dataset.itemid;
+            if (itemId && cartMap.has(itemId)) {
+                change_button(itemId, cartMap.get(itemId));
+            }
+        });
     })
     .catch(error => {
         console.log(error);
     })
     // const button = document.querySelector(`.add_to_cart[data-itemid="${id}"]`);
 }
-function addToCart() {
-    const itemDivs = document.querySelectorAll(".item_div")
-    category_amount()
-    itemDivs.forEach(div => {
-        const buttonEl = div.querySelector(".add_to_cart");
-        buttonEl.addEventListener("click", function () {
-            if (logg) {
-                fetch("./php/add_offer.php", {
-                    method: "POST",
-                    headers: {"Content-Type":"application/JSON"},
-                    body: JSON.stringify(parseInt(buttonEl.dataset.itemid, 10))
-                }).then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        category_amount()
-                    }
-                })
-                .catch(error => {
-                    console.log("Error: " + error);
-                })
-            } else {
-                console.log("Нужно войти");
-            }
-                       
-        })
-        
+document.addEventListener("DOMContentLoaded", () => {
+    if (document.getElementById("categories__grid")) {
+    document.getElementById("categories__grid").addEventListener("click", function (e) {
+    const addBtn = e.target.closest(".add_to_cart");
+    const increaseBtn = e.target.closest(".increase");
+    const decreaseBtn = e.target.closest(".decrease");
+    if (addBtn && this.contains(addBtn)) {
+        const id = parseInt(addBtn.dataset.itemid, 10);
+        if (logg) {
+            fetch("./php/add_offer.php", {
+                method: "POST",
+                headers: {"Content-Type":"application/JSON"},
+                body: JSON.stringify(id)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    addToCart()
+                }
+            })
+            .catch(error => {
+                console.log("Error: " + error);
+            })
+        } else {
+            console.log("Нужно войти");
+        }
+        console.log("Add to cart:", id);
+        return;
+    }
+
+    if (increaseBtn) {
+        console.log("Increase clicked");
+        return;
+    }
+
+    if (decreaseBtn) {
+        console.log("Decrease clicked");
+        return;
+    }
     });
+    }
+    
+})
+
+function x() {
+    // category_amount()
+    // const itemDivs = document.querySelectorAll(".item_div")
+    // itemDivs.forEach(div => {
+    //     const buttonEl = div.querySelector(".add_to_cart");
+    //     buttonEl.addEventListener("click", function () {
+    //     
+                       
+    //     })
+        
+    // });
 }
 
 async function renderCart() {
