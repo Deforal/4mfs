@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <script defer src="./script.js"></script>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -15,7 +14,7 @@
         <a href="index.html">Главная</a>
         <p>/ Личный кабинет</p>
     </div>
-    <section class="PA__top">
+    <section class="PA__top" data-PA = "personal">
         <div class="PA__top_div">
             <h1>Добро пожаловать, <span id="username">...</span></h1>
             <button onclick="window.location.href='./php/logout.php'" class="PA__logout">Выйти из профиля</button>
@@ -30,7 +29,7 @@
     </section>
     
    
-    <section class="PA__cart center">
+    <section class="PA__cart center" data-PA ="cart">
         
         <div class="cart__top">
             <h1>Корзина</h1>
@@ -54,5 +53,7 @@
     </Main>
     <footer class="footer">
     </footer>
+    
+    <script src="./script.js"></script>
 </body>
 </html>

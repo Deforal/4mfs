@@ -239,12 +239,40 @@ h2 {
 .item_div__img {
   height: 347px;
 }
+.item_div__amount {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  width: 100%;
+}
+.item_div__amount_div {
+  background: rgba(255, 255, 255, 0);
+  border-radius: 15px;
+  border: 2px solid black;
+  font-family: "Montserrat";
+  font-style: normal;
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 22px;
+  text-align: center;
+  color: #000000;
+  transition: all 0.05s;
+  padding: 16px;
+}
+.item_div__amount img {
+  height: 35px;
+  transition: all 0.1s;
+}
+.item_div__amount img:active {
+  scale: 1.1;
+}
 
 .price_n_button {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 10px;
+  width: 100%;
 }
 
 .add_to_cart {
@@ -260,7 +288,7 @@ h2 {
   line-height: 22px;
   text-align: center;
   color: #000000;
-  transition: all 0.2s;
+  transition: all 0.1s;
 }
 .add_to_cart:hover {
   scale: 1.02;
@@ -269,18 +297,23 @@ h2 {
   box-shadow: 2px 2px 2px 2px;
 }
 .add_to_cart__amount {
+  display: flex;
+  flex-direction: column;
   height: 100%;
-  border-radius: 10px;
-  border: 2px solid #000;
-  box-sizing: border-box;
-  padding: 5px;
+  gap: 2px;
+  width: 60%;
 }
-.add_to_cart__amount::-webkit-outer-spin-button, .add_to_cart__amount::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-          appearance: none;
-  background-color: transparent;
-  border: 0.5px solid #000;
-  height: 15px;
+.add_to_cart__amount button {
+  color: white;
+  width: 100%;
+  height: 50%;
+  background-color: #5E8A62;
+  border: none;
+  border-radius: 10px;
+  transition: all 0.1s;
+}
+.add_to_cart__amount button:active {
+  scale: 1.06;
 }
 
 .item_name {

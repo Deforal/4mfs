@@ -2,32 +2,46 @@
 let logg
 function checkAuthStatus() {
     return fetch("./php/auth.php")
-        .then(response => response.json())
-        .then(data => {
-            console.log("Auth status:", data);
-            if (data.loggedIn) {
-                logg = "user";
-                document.getElementById("username").textContent = data.user.name;
-                document.getElementById("userEmail").textContent = data.user.email;
-                const phone = document.getElementById("userPhone");
-                data.user.phone ? phone.textContent = data.user.phone : phone.textContent = "Номера телефона не прикреплен"
-                
-                if (data.user.role == "1") {
-                    logg = "admin"
-                    document.getElementById("adminPanel").classList.remove("hidden");
-                    showAdminPanel();
-                }
+    .then(response => response.json())
+    .then(data => {
+        console.log("Auth status:", data);
+        if (data.loggedIn) {
+            logg = "user";
+            if (data.user.role == "1") {
+                logg = "admin"
             }
-        })
-        .catch(error => console.error("Error checking login status:", error));
+        }
+    })
+    .catch(error => console.error("Error checking login status:", error));
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    document.querySelectorAll(".edit-btn").forEach(button => {
-        button.addEventListener("click", () => showForm(button.dataset.field));
-    });
+    if (document.querySelector("[data-PA='personal']")) {
+        PA_info();
+        renderCart();
+        document.querySelectorAll(".edit-btn").forEach(button => {
+            button.addEventListener("click", () => showForm(button.dataset.field));
+        });
+    }  
 });
-
+function PA_info() {
+    fetch("./php/auth.php")
+    .then(response => response.json())
+    .then(data => {
+        console.log("Auth status:", data);
+        if (data.loggedIn) {
+            document.getElementById("username").textContent = data.user.name;
+            document.getElementById("userEmail").textContent = data.user.email;
+            const phone = document.getElementById("userPhone");
+            data.user.phone ? phone.textContent = data.user.phone : phone.textContent = "Номера телефона не прикреплен"
+            if (data.user.role == "1") {
+                document.getElementById("adminPanel").classList.remove("hidden");
+                showAdminPanel();
+            }
+        }
+    })
+    .catch(error => console.error("Error checking login status:", error));
+}
 function showForm(field) {
     let fieldSpan = document.getElementById(`user${field}`);
     if (!fieldSpan) return;
@@ -285,25 +299,69 @@ function footer() {
 checkAuthStatus().then(() => {
     header();
     footer();
-    renderCart();
 })
-
+function change_button(id, element) {
+    const button = document.querySelector(`[data-itemid="${id}"]`)
+    if (element) {
+        button.outerHTML = `
+        <div class="item_div__amount" data-itemid="${id}" data-itemType="div">
+            <div class="item_div__amount_div">Добавлено: ${element.Count}</div>
+            <div class="add_to_cart__amount">
+                <button class="increase">▲</button>
+                <button class="decrease">▼</button>  
+            </div>
+            <img src="./img/trash_can.svg" alt="" onclick=delete_itemCart(${element.Product_id})>
+        </div>
+        `;
+    } else {
+        button.outerHTML = `<button class="add_to_cart" data-itemid = "${id}">В корзину</button>`;
+    }
+    
+}
+function category_amount() {
+    fetch("./php/get_cart.php")
+    .then(response => response.json())
+    .then(data => {
+        const itemDivs = document.querySelectorAll(".item_div")
+        itemDivs.forEach(div => {
+            const buttonEl = div.querySelector("[data-itemid]");
+            let id = buttonEl.dataset.itemid
+            data.data.forEach(element => {
+                if(element.Product_id == buttonEl.dataset.itemid) {
+                    change_button(buttonEl.dataset.itemid, element) 
+                }
+            });
+        })
+    })
+    .catch(error => {
+        console.log(error);
+    })
+    // const button = document.querySelector(`.add_to_cart[data-itemid="${id}"]`);
+}
 function addToCart() {
     const itemDivs = document.querySelectorAll(".item_div")
+    category_amount()
     itemDivs.forEach(div => {
         const buttonEl = div.querySelector(".add_to_cart");
         buttonEl.addEventListener("click", function () {
-            if (!logg) {
-                alert("Нужно войти")
-            } else(
+            if (logg) {
                 fetch("./php/add_offer.php", {
                     method: "POST",
                     headers: {"Content-Type":"application/JSON"},
                     body: JSON.stringify(parseInt(buttonEl.dataset.itemid, 10))
-                }).catch(error => {
+                }).then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        category_amount()
+                    }
+                })
+                .catch(error => {
                     console.log("Error: " + error);
                 })
-            )            
+            } else {
+                console.log("Нужно войти");
+            }
+                       
         })
         
     });
@@ -392,7 +450,12 @@ async function delete_itemCart(id) {
             body: JSON.stringify(id)
         })
         const success = await ordering.json();
-        renderCart();
+        if(document.querySelector('[data-PA ="cart"]')) {
+           renderCart(); 
+        } else {
+            change_button(id)
+            addToCart()
+        }
     } catch (error) {
         console.log("Error" + error);
     }
@@ -545,7 +608,14 @@ function sortByPrice() {
         console.error('There was a problem with the fetch operation:', error);
     });
 }
-document.getElementById("reg_form").addEventListener('submit', function(event) {
+document.addEventListener("DOMContentLoaded", () => {
+    if (document.querySelector("[data-form='log_reg']")) {
+        reg_form();
+        log_form();
+    }
+})
+function reg_form() {
+    document.getElementById("reg_form").addEventListener('submit', function(event) {
     event.preventDefault()
     const fields = document.querySelectorAll ('[data-register]')
     const Allfields = {}
@@ -588,9 +658,12 @@ document.getElementById("reg_form").addEventListener('submit', function(event) {
             element.textContent = jsonData.error;
         }
     })
-    .catch(error => console.error("Error:", error));
-})
-document.getElementById("log_form").addEventListener('submit', function(event) {
+        .catch(error => console.error("Error:", error));
+    })
+}
+
+function log_form() {
+    document.getElementById("log_form").addEventListener('submit', function(event) {
     event.preventDefault()
     const fields = document.querySelectorAll ('[data-login]')
     const Allfields = {}
@@ -626,5 +699,7 @@ document.getElementById("log_form").addEventListener('submit', function(event) {
             element.textContent = jsonData.error;
         }
     })
-    .catch(error => console.error("Error:", error));
-})
+        .catch(error => console.error("Error:", error));
+    })
+}
+

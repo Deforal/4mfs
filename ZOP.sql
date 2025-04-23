@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: 127.0.0.1:3306
--- Время создания: Мар 05 2025 г., 08:32
+-- Время создания: Апр 03 2025 г., 06:08
 -- Версия сервера: 8.0.30
 -- Версия PHP: 7.2.34
 
@@ -54,12 +54,9 @@ CREATE TABLE `Offers` (
 --
 
 INSERT INTO `Offers` (`Offer_id`, `Product_id`, `User_id`, `Stage`, `Count`) VALUES
-(1, 2, 15, 'в корзине', 4),
-(9, 1, 15, 'в корзине', 1),
-(10, 3, 15, 'в корзине', 1),
-(11, 4, 15, 'в корзине', 1),
-(12, 5, 15, 'в корзине', 1),
-(13, 6, 15, 'в корзине', 1);
+(32, 3, 15, 'в обработке', 1),
+(33, 4, 15, 'в обработке', 1),
+(35, 3, 16, 'в корзине', 2);
 
 -- --------------------------------------------------------
 
@@ -161,7 +158,7 @@ CREATE TABLE `Users` (
 
 INSERT INTO `Users` (`id`, `role`, `Email`, `Phone`, `Name`, `Password`) VALUES
 (15, 1, 'g@g.gh', '+79501197803', 'g', '$2y$10$JYZNz9ZM6xSc/SrBPAUyJOwVmsCWVpeSpoIDxMVEsyXXaEw0hSJQe'),
-(16, 0, 'g@g.gb', NULL, 'g', '$2y$10$vUZtAelyxyWCn6mdv432ueup3Pk2Jq4X9fE7YlWsgrmxqj04wmAFu');
+(16, 0, 'g@gg.g', NULL, 'g', '$2y$10$vUZtAelyxyWCn6mdv432ueup3Pk2Jq4X9fE7YlWsgrmxqj04wmAFu');
 
 --
 -- Индексы сохранённых таблиц
@@ -207,7 +204,7 @@ ALTER TABLE `Feedback`
 -- AUTO_INCREMENT для таблицы `Offers`
 --
 ALTER TABLE `Offers`
-  MODIFY `Offer_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `Offer_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
 
 --
 -- AUTO_INCREMENT для таблицы `Products`
@@ -219,7 +216,7 @@ ALTER TABLE `Products`
 -- AUTO_INCREMENT для таблицы `Users`
 --
 ALTER TABLE `Users`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- Ограничения внешнего ключа сохраненных таблиц
