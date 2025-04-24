@@ -20,20 +20,23 @@
             <button onclick="window.location.href='./php/logout.php'" class="PA__logout">Выйти из профиля</button>
         </div>
         <div class="PA__top_div">
-            <p>Ваша почта: <span id="userEmail">пп****пп@gg.g</span> <button class="edit-btn" data-field="Email">изменить</button></p>
-            <p>Телефон: <span id="userPhone">+7**********</span> <button class="edit-btn" data-field="Phone">изменить</button></p>
+            <p>Ваша почта: <span id="userEmail">пп****пп@gg.g</span> <button class="edit-btn PA__top_edit" data-field="Email">изменить</button></p>
+            <p>Телефон: <span id="userPhone">+7**********</span> <button class="edit-btn PA__top_edit" data-field="Phone">изменить</button></p>
         </div>
         <div id="adminPanel" class="admin_panel hidden">
                     
         </div>
     </section>
-    
    
     <section class="PA__cart center" data-PA ="cart">
         
         <div class="cart__top">
             <h1>Корзина</h1>
-            <button onclick="orderCart('all')">Заказать все</button>
+            <div>
+                <button>Очистить</button>
+                <button onclick="orderCart('all')">Заказать все</button>
+            </div>
+            
         </div>
         <section class="cart">
             

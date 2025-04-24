@@ -303,18 +303,26 @@ function change_button(id, element) {
     if (element) {
         button.outerHTML = `
         <div class="item_div__amount" data-itemid="${id}" data-itemType="div">
+            <img src="./img/trash_can.svg" alt="" onclick=delete_itemCart(${id})>
             <div class="item_div__amount_div">Добавлено: ${element.Count}</div>
             <div class="add_to_cart__amount">
-                <button class="increase">▲</button>
-                <button class="decrease">▼</button>  
+                <button class="increase" data-itemid = "${id}">▲</button>
+                <button class=${element.Count == 1 ? `"disabled_decrease" disabled` : "decrease"} data-itemid = "${id}">▼</button>  
             </div>
-            <img src="./img/trash_can.svg" alt="" onclick=delete_itemCart(${element.Product_id})>
+            
         </div>
         `;
     } else {
         button.outerHTML = `<button class="add_to_cart" data-itemid = "${id}">В корзину</button>`;
     }
     
+}
+function change_amount(id, count) {
+    let div = 0;
+    if (div = document.querySelector(`[data-itemid="${id}"]`)) {
+        const amount = div.querySelector(".item_div__amount_div")
+        amount.innerHTML = `Добавлено: ${count}`
+    }
 }
 function addToCart() {
     fetch("./php/get_cart.php")
@@ -340,60 +348,75 @@ function addToCart() {
 }
 document.addEventListener("DOMContentLoaded", () => {
     if (document.getElementById("categories__grid")) {
-    document.getElementById("categories__grid").addEventListener("click", function (e) {
-    const addBtn = e.target.closest(".add_to_cart");
-    const increaseBtn = e.target.closest(".increase");
-    const decreaseBtn = e.target.closest(".decrease");
-    if (addBtn && this.contains(addBtn)) {
-        const id = parseInt(addBtn.dataset.itemid, 10);
-        if (logg) {
-            fetch("./php/add_offer.php", {
-                method: "POST",
-                headers: {"Content-Type":"application/JSON"},
-                body: JSON.stringify(id)
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    addToCart()
+        document.getElementById("categories__grid").addEventListener("click", function (e) {
+            const addBtn = e.target.closest(".add_to_cart");
+            const increaseBtn = e.target.closest(".increase");
+            const decreaseBtn = e.target.closest(".decrease");
+            if (addBtn || increaseBtn) {
+                const id = parseInt(addBtn?.dataset.itemid || increaseBtn?.dataset.itemid, 10);
+                if (logg) {
+                    fetch("./php/add_offer.php", {
+                        method: "POST",
+                        headers: {"Content-Type":"application/JSON"},
+                        body: JSON.stringify(id)
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        const object = {}
+                        if (data.data.Count == 1) {
+                            object.Count = data.data.Count
+                            console.log(object);
+                            change_button(id, object)
+                        } else if (data.data.Count == 2 ) {
+                            object.Count = data.data.Count
+                            change_button(id, object)
+                        } else {
+                            object.Count = data.data.Count
+                            change_amount(id, data.data.Count)
+                        }
+                    })
+                    .catch(error => {
+                        console.log("Error: " + error);
+                    })
+                } else {
+                    console.log("Нужно войти");
                 }
-            })
-            .catch(error => {
-                console.log("Error: " + error);
-            })
-        } else {
-            console.log("Нужно войти");
-        }
-        console.log("Add to cart:", id);
-        return;
-    }
+                console.log("Add to cart:", id);
+                return;
+            }
 
-    if (increaseBtn) {
-        console.log("Increase clicked");
-        return;
-    }
-
-    if (decreaseBtn) {
-        console.log("Decrease clicked");
-        return;
-    }
-    });
+            if (decreaseBtn) {
+                const id = Number(decreaseBtn.dataset.itemid)
+                console.log("Decrease clicked");
+                fetch("./php/decrease_amount.php", {
+                    method: "POST",
+                    headers: {"Content-Type":"application/JSON"},
+                    body: JSON.stringify(id)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const object = {}
+                        if (data.data.Count == 1) {
+                            object.Count = data.data.Count
+                            change_button(id, object)
+                        } else {
+                            object.Count = data.data.Count
+                            change_amount(id, data.data.Count)
+                        }
+                    } else {
+                        console.log(data.error);
+                    }
+                })
+                .catch(error => {
+                    console.log("Error: " + error);
+                })
+                return;
+            }
+        });
     }
     
 })
-
-function x() {
-    // category_amount()
-    // const itemDivs = document.querySelectorAll(".item_div")
-    // itemDivs.forEach(div => {
-    //     const buttonEl = div.querySelector(".add_to_cart");
-    //     buttonEl.addEventListener("click", function () {
-    //     
-                       
-    //     })
-        
-    // });
-}
 
 async function renderCart() {
     try {
@@ -432,8 +455,12 @@ async function renderCart() {
                     <img src="./img/${item.Img_name}" alt="${item.Name}">
                     <div class="cart__item_left_column">
                         <p>Название: ${item.Name}</p>
-                        <p>Количество: ${item.count}</p>
                         <p>Цена: ${item.Special_price || item.Price} руб.</p>
+                        <div class="cart__item_left_amount">
+                            <button class="increase" data-itemid = "">▲</button>
+                            <p><i>Количество: ${item.count}</i></p>
+                            <button class="decrease" data-itemid = "">▼</button> 
+                        </div>
                         <p class="cart__item_overall">Итого: ${item.count * (item.Special_price || item.Price)} руб.</p>
                     </div>
                 </div>

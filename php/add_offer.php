@@ -20,6 +20,8 @@ $checkSql->execute();
 $result = $checkSql->get_result();
 $checkSql->close();
 
+$newCount= 0;
+
 if ($row = $result->fetch_assoc()) {
     // Item exists, increase the count
     $newCount = $row['Count'] + 1;
@@ -33,12 +35,14 @@ if ($row = $result->fetch_assoc()) {
     $insertSql->bind_param("iis", $userID, $itemID, $stage);
     $success = $insertSql->execute();
     $insertSql->close();
+    $newCount++;
 }
 
 $conn->close();
-
+$array = array();
+$array['Count'] = $newCount;
 if ($success) {
-    echo json_encode(["success" => true]);
+    echo json_encode(["success" => true, "data" => $array]);
 } else {
     echo json_encode(["error" => "Ошибка при добавлении товара"]);
 }

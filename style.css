@@ -276,18 +276,17 @@ h2 {
 }
 
 .add_to_cart {
-  width: 146px;
-  height: 45px;
+  padding: 20px;
   background: #5E8A62;
   border-radius: 15px;
   border: none;
   font-family: "Montserrat";
   font-style: normal;
   font-weight: 600;
-  font-size: 18px;
+  font-size: 24px;
   line-height: 22px;
   text-align: center;
-  color: #000000;
+  color: #ffffff;
   transition: all 0.1s;
 }
 .add_to_cart:hover {
@@ -314,6 +313,15 @@ h2 {
 }
 .add_to_cart__amount button:active {
   scale: 1.06;
+}
+.add_to_cart__amount .disabled_decrease {
+  color: black;
+  width: 100%;
+  height: 50%;
+  background-color: rgba(255, 255, 255, 0);
+  border: black solid 2px;
+  border-radius: 10px;
+  transition: none;
 }
 
 .item_name {
@@ -752,6 +760,7 @@ section.main_bottom p {
   font-style: normal;
   font-weight: 500;
   font-size: 30px;
+  border: 2px solid black;
   line-height: 37px;
   width: 300px;
   transition: all 0.2s;
@@ -777,7 +786,26 @@ section.main_bottom p {
   align-items: center;
 }
 .PA__top h1 {
+  border-top-left-radius: 10px;
+  border-top-right-radius: 15px;
+  line-break: auto;
+  padding-left: 10px;
+  padding-right: 5%;
   font-size: 32px;
+  border-top: #000 1px solid;
+  border-left: #000 1px solid;
+}
+.PA__top p {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.PA__top_edit {
+  background-color: transparent;
+  font-size: 20px;
+  box-sizing: border-box;
+  padding: 8px;
+  border-radius: 10px;
 }
 .PA__cart {
   display: flex;
@@ -801,6 +829,11 @@ section.main_bottom p {
   display: flex;
   justify-content: space-between;
 }
+.cart__top div {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
 .cart__top button {
   width: 250px;
   padding: 10px;
@@ -810,6 +843,7 @@ section.main_bottom p {
   font-style: normal;
   font-weight: 500;
   font-size: 30px;
+  border: none;
   line-height: 37px;
   transition: all 0.2s;
 }
@@ -837,6 +871,27 @@ section.main_bottom p {
   justify-content: space-between;
   border-left: 8px double black;
 }
+.cart__item_left_amount {
+  border-top: 1px solid #000;
+  border-bottom: 1px solid #000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 60%;
+  gap: 10px;
+}
+.cart__item_left_amount button {
+  background-color: #5E8A62;
+  border: none;
+  border-radius: 10px;
+  color: white;
+  height: 30px;
+  width: 40%;
+  transition: all 0.1s;
+}
+.cart__item_left_amount button:active {
+  scale: 1.05;
+}
 .cart__item_right {
   display: flex;
   flex-direction: column;
@@ -857,6 +912,7 @@ section.main_bottom p {
   border-radius: 15px;
   color: #FFFFFF;
   font-style: normal;
+  border: none;
   font-weight: 500;
   font-size: 30px;
   line-height: 37px;
