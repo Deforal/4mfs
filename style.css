@@ -784,6 +784,8 @@ section.main_bottom p {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 .PA__top h1 {
   border-top-left-radius: 10px;
@@ -806,6 +808,17 @@ section.main_bottom p {
   box-sizing: border-box;
   padding: 8px;
   border-radius: 10px;
+}
+.PA__top_input {
+  width: 200px;
+  height: 50px;
+  border: 1px solid #000000;
+  border-radius: 10px;
+  padding: 10px;
+  box-sizing: border-box;
+  font-weight: 400;
+  font-size: 20px;
+  white-space: normal;
 }
 .PA__cart {
   display: flex;
@@ -891,6 +904,14 @@ section.main_bottom p {
 }
 .cart__item_left_amount button:active {
   scale: 1.05;
+}
+.cart__item_left_amount .disabled_decrease {
+  color: #000;
+  background-color: #fff;
+  border: 1px solid #000;
+}
+.cart__item_left_amount .disabled_decrease:active {
+  scale: 1;
 }
 .cart__item_right {
   display: flex;

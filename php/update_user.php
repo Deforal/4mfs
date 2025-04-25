@@ -37,6 +37,8 @@ if ($field === "Email") {
         exit;
     }
     $sql = "UPDATE Users SET Phone = ? WHERE ID = ?";
+} elseif ($field === "Name") {
+    $sql = "UPDATE Users SET Name = ? WHERE ID = ?";
 } else {
     echo json_encode(["error" => "Неверное поле для обновления."]);
     exit;
@@ -50,6 +52,8 @@ if ($stmt->execute()) {
     echo json_encode(["success" => "Данные обновлены.", "newValue" => $value]);
     if ($field === "Email") {
         $_SESSION["email"] = $value;
+    } elseif ($field === "Name") {
+        $_SESSION["user_name"] = $value;
     } else {
         $_SESSION["phone"] = $value;
     }
