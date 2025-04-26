@@ -888,6 +888,7 @@ section.main_bottom p {
                 justify-content: space-between;
                 border-left: 8px double black;
             }
+            
             &_amount {
                 border-top: 1px solid #000;
                 border-bottom: 1px solid #000;
@@ -955,6 +956,83 @@ section.main_bottom p {
             padding: 10px;
             border-radius: 10px;
             background-color: #8e8e8e2d;
+        }
+    }
+}
+.history__item.hidden, .history__section.hidden {
+    opacity: 0;
+    height: 0;
+    gap: 0;
+    padding: 0;
+    margin: 0;
+    transform: translateY(20px); /* move down a little */
+    pointer-events: none; /* makes it unclickable */
+}
+.history{
+    &__section{
+        padding-top: 32px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: auto;
+        gap: 30px;
+
+        transition: opacity 0.5s, transform 0.5s, height 1.5s;
+        opacity: 1;
+        transform: translateY(0);
+    }
+    &__top{
+        padding-top: 10px;
+        display: flex;
+        justify-content: space-between;
+        & button {
+            width: 150px;
+            padding: 10px;
+            background: #5E8A62;
+            border-radius: 15px;
+            color: #FFFFFF;
+            font-style: normal;
+            border: none;
+            font-weight: 500;
+            font-size: 30px;
+            line-height: 37px;
+            transition: all 0.2s;
+            &:active {
+                transform: scale(1.05);
+            }
+        }
+    }
+    &__item{
+        display: flex;
+        width: 100%;
+        gap: 10px;
+
+        transition: opacity 0.5s, transform 0.5s, height 1.5s;
+        opacity: 1;
+        transform: translateY(0);
+
+        &_right {
+            border-left: #000 solid 3px;
+            padding-left: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            line-break: anywhere;
+            & button {
+                width: 100%;
+                padding: 10px;
+                background: #5E8A62;
+                border-radius: 15px;
+                color: #FFFFFF;
+                font-style: normal;
+                border: none;
+                font-weight: 500;
+                font-size: 30px;
+                line-height: 37px;
+                transition: all 0.2s;
+                &:active {
+                    transform: scale(1.05);
+                }
+            }
         }
     }
 }

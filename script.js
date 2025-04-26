@@ -14,11 +14,81 @@ function checkAuthStatus() {
     })
     .catch(error => console.error("Error checking login status:", error));
 }
+function header() {
+    const header = document.querySelector("header")
+    if (header.classList == "header") {
+        header.innerHTML = `<div class="top">
+        <div class="top__logo">
+            <a href="index.html"><img src="img/layer1.svg" alt=""></a>
+        </div>
+        <nav class="top__nav">
+            <a href="catagories.html" class="top__nav_category">Категории</a>
+            <a href="${logg ? "PA.html" : "Login_form.html"}" class="top__nav_sales">
+                ${logg ? "Личный кабинет" : "Вход/Регистрация"}
+            </a>
+        </nav>
+        </div>`
+    } else {
+        let content = `
+        <div class="top_else">
+            <div class="top__logo">
+                <a href="index.html"><img src="img/layer1.svg" alt=""></a>
+            </div>
+            <nav class="top__nav">
+            `
+            if (header.dataset.header == "Login") {
+                content += `
+                <a href="catagories.html" class="top__nav_category">Категории</a>
+                `
+            } else if (header.dataset.header == "categories") {
+                content +=`
+                <a href="${logg ? "PA.html" : "Login_form.html"}" class="top__nav_sales">
+                ${logg ? "Личный кабинет" : "Вход/регистрация"}
+                </a>
+                `
+            }  else {
+                content +=`
+                <a href="catagories.html" class="top__nav_category">Категории</a>
+                <a href="${logg ? "PA.html" : "Login_form.html"}" class="top__nav_sales">
+                    ${logg ? "Личный кабинет" : "Вход/Регистрация"}
+                </a>
+                `
+            }
+            
+        content += `</nav> </div>`
+        header.innerHTML += content
+    }
+    
+}
+function footer() {
+    const footer = document.querySelectorAll(".footer")
+    footer.forEach(element => {
+        element.innerHTML += `
+        <div class="footer__logo">
+        <a href="index.html"><img src="img/layer1.svg" alt=""></a>
+        </div>
+        <nav class="footer__nav">
+            <div class="footer__nav_links">
+                <a href="manufactors.html">Производители</a>
+                <a href="delivery.html">Доставка</a>
+                <a href="payment.html">Оплата</a>
+                <a href="contacts.html">Обратная связь</a>
+            </div>
+            <p>г.Иркутск, ул. Баррикад, д. 147 Телефон: (8924) 70-11-548  e-mail: epikego@mail.ru</p>
+        </nav>`
+    });
+}
+
+checkAuthStatus().then(() => {
+    header();
+    footer();
+})
 
 document.addEventListener("DOMContentLoaded", () => {
     if (document.querySelector("[data-PA='personal']")) {
         PA_info();
         renderCart();
+        render_previousOffers();
         document.querySelectorAll(".edit-btn").forEach(button => {
             button.addEventListener("click", () => showForm(button.dataset.field));
         });
@@ -52,7 +122,7 @@ function showForm(field) {
     
     formContainer.innerHTML = `
         <span id="user${field}">
-            <input class="PA__top_input" type="text" id="new${field}" value="${currentValue == "Номера телефона не прикреплен" ? "" : currentValue}" maxlength="${field == "Name" ? "20" : field == "Phone" ? "13" : ""}">
+            <input class="PA__top_input" type="text" id="new${field}" value="${currentValue == "Номера телефона не прикреплен" ? '' : currentValue}" maxlength="${field == 'Name' ? '20' : field == 'Phone' ? '13' : ''}" ${field == "Phone" ? 'placeholder = "+7988-888-88-88"' : ''}>
         </span>
         <button class="PA__top_edit" onclick="updateUser('${field}')">Сохранить</button>
         <button class="PA__top_edit" onclick="cancelEdit('${field}', '${currentValue}')">Отмена</button>
@@ -239,80 +309,10 @@ function editProduct(id, field, element) {
     .catch(error => console.error("Fetch error:", error));
 }
 
-function header() {
-    const header = document.querySelector("header")
-    if (header.classList == "header") {
-        header.innerHTML = `<div class="top">
-        <div class="top__logo">
-            <a href="index.html"><img src="img/layer1.svg" alt=""></a>
-        </div>
-        <nav class="top__nav">
-            <a href="catagories.html" class="top__nav_category">Категории</a>
-            <a href="${logg ? "PA.html" : "Login_form.html"}" class="top__nav_sales">
-                ${logg ? "Личный кабинет" : "Вход/Регистрация"}
-            </a>
-        </nav>
-        </div>`
-    } else {
-        let content = `
-        <div class="top_else">
-            <div class="top__logo">
-                <a href="index.html"><img src="img/layer1.svg" alt=""></a>
-            </div>
-            <nav class="top__nav">
-            `
-            if (header.dataset.header == "Login") {
-                content += `
-                <a href="catagories.html" class="top__nav_category">Категории</a>
-                `
-            } else if (header.dataset.header == "categories") {
-                content +=`
-                <a href="${logg ? "PA.html" : "Login_form.html"}" class="top__nav_sales">
-                ${logg ? "Личный кабинет" : "Вход/регистрация"}
-                </a>
-                `
-            }  else {
-                content +=`
-                <a href="catagories.html" class="top__nav_category">Категории</a>
-                <a href="${logg ? "PA.html" : "Login_form.html"}" class="top__nav_sales">
-                    ${logg ? "Личный кабинет" : "Вход/Регистрация"}
-                </a>
-                `
-            }
-            
-        content += `</nav> </div>`
-        header.innerHTML += content
-    }
-    
-}
-function footer() {
-    const footer = document.querySelectorAll(".footer")
-    footer.forEach(element => {
-        element.innerHTML += `
-        <div class="footer__logo">
-        <a href="index.html"><img src="img/layer1.svg" alt=""></a>
-        </div>
-        <nav class="footer__nav">
-            <div class="footer__nav_links">
-                <a href="manufactors.html">Производители</a>
-                <a href="delivery.html">Доставка</a>
-                <a href="payment.html">Оплата</a>
-                <a href="contacts.html">Обратная связь</a>
-            </div>
-            <p>г.Иркутск, ул. Баррикад, д. 147 Телефон: (8924) 70-11-548  e-mail: epikego@mail.ru</p>
-        </nav>`
-    });
-}
-
-checkAuthStatus().then(() => {
-    header();
-    footer();
-})
 function change_button(id, element) {
     const button = document.querySelector(`[data-itemid="${id}"]`)
     if (element) {
         if (element.place =="cart") {
-            console.log("cart_start");
             const amount = button.querySelector(".cart__item_left_amount")
             const column = amount.parentElement
             const price = column.querySelector(".cart__item_overall")
@@ -495,8 +495,9 @@ async function renderCart() {
                 <div class="cart__item_left">
                     <img src="./img/${item.Img_name}" alt="${item.Name}">
                     <div class="cart__item_left_column" data-itemid = "${item.id}">
-                        <p>Название: ${item.Name}</p>
-                        <p>Цена: ${item.Special_price || item.Price} руб.</p>
+                        <p class ="cart__item_left_name"> Название: <b>${item.Name}</b></p>
+                        <p>Цена: <b> ${item.Special_price || item.Price} руб. </b></p>
+                        ${ item.Special_price ? `<p class="second_price"> Цена без акции: ${item.Price} руб.</p>` : ''}
                         <div class="cart__item_left_amount">
                             <button class="increase" data-itemid = "${item.id}">▲</button>
                             <p><i class="cart__item_left_i">Количество: ${item.count}</i></p>
@@ -522,7 +523,75 @@ async function renderCart() {
         console.log("Error: " + error);
     }
 }
-
+async function render_previousOffers() {
+    try {
+        const prevOffers = await fetch("./php/prevOffers.php")
+        const offers = await prevOffers.json();
+        console.log(offers);
+        if (offers.error) {
+            console.log(offers.error);
+            return;
+        }
+        const products_fetch = await fetch("./php/data.php")
+        const products = await products_fetch.json();
+        console.log(products);
+        if (products.error) {
+            console.log(products.error);
+            return;
+        }
+        const cartMap = new Map();
+        offers.data.forEach(item => {
+            cartMap.set(item.Product_id, item)
+        })
+        console.log(cartMap);
+        const matching_products = products.filter(product => cartMap.has(Number(product.id)))
+        const renderMap = new Map();
+        matching_products.forEach(item => {
+            renderMap.set(Number(item.id), item)
+        })
+        const section = document.querySelector(".history__section")
+        let string = "";
+        offers.data.forEach(offer => {
+            let renderData = renderMap.get(offer.Product_id)
+            string += `
+            <div class="history__item">
+                <img src="./img/${renderData.Img_name}" alt="">
+                <div class="history__item_right">
+                    <p>Название: ${renderData.Name}</p>
+                    <p>Дата заказа: ${offer.Date} </p>
+                    <p>Описание: ${renderData.Desciption || "Описание товара нет"}</p>
+                    <button>Добавить в корзину</button>
+                </div>
+            </div>
+            `
+        })
+        section.innerHTML = string;
+    } catch (error) {
+        console.log(error);
+    }
+    
+}
+function hide_offers() {
+    const button = document.getElementById("hide_button");
+    const section = document.getElementById("history__section");
+    const items = section.querySelectorAll(".history__item")
+    console.log(section);
+    if (button.dataset.display == "grid") {
+        items.forEach(item => {
+            item.classList.add("hidden");
+        });
+        section.classList.add("hidden");
+        button.innerText = "Показать";
+        button.dataset.display = "none";
+    } else {
+        items.forEach(item => {
+            item.classList.remove("hidden");
+        });
+        section.classList.remove("hidden");
+        button.innerText = "Скрыть";
+        button.dataset.display = "grid";
+    }
+}
 async function orderCart(id) {
     try {
         const ordering = await fetch("./php/order_cart.php", {
