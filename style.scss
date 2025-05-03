@@ -241,6 +241,9 @@ h2 {
     justify-content: space-between;
     align-items: center;
     transition: all 0.2s;
+    &:hover {
+        scale: 1.01;
+    }
     &__img {
         height: 347px;
     }
@@ -274,6 +277,97 @@ h2 {
     
 }
 
+.item_card {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90vw;
+    height: 80vh;
+    background: white;
+    border-radius: 1rem;
+    overflow: hidden; /* important */
+    box-shadow: 0 0 20px rgba(0,0,0,0.2);
+    z-index: 999;
+    box-sizing: border-box;
+
+    border-radius: 10px;
+    border: #000 1px solid;
+    &_scrollable {
+        width: 100%;
+        height: 100%;
+        box-sizing: border-box;
+        overflow-y: auto;
+        padding: 1rem;
+
+        display: flex;
+        flex-direction: column;
+        // 🛠 change this:
+        // align-items: flex-end; ❌ this is shrinking your modal content
+        align-items: flex-end; // or remove this line entirely
+    }
+    & img {
+        width: 50px;
+    }
+    &_left {
+        display: flex;
+        gap: 10px;
+        flex-direction: column;
+        align-items: center;
+        padding-right: 20px;
+        padding-top: 16px;
+        padding-left: 20px;
+    }
+    &_main {
+        width: 100%;
+        display: flex;
+        border-top: #000 solid 1px;
+        margin-top: 10px;
+        & img {
+            width: auto;
+        }
+    }
+    &_descr {
+        border-left: #000 1px solid;
+        padding-left: 16px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+        word-break: break-word;
+        text-align: justify;
+        gap: 10px;
+        padding-top: 15px;
+        & h3 {
+            font-size: 24px;
+        }
+        & p {
+            font-size: 16px;
+        }
+        &_top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            & img {
+                width: 50px;
+            }
+        }
+    }
+    &BG {
+        top: 0;
+        left: 0;
+        position: fixed;
+        width: 100vw;
+        height: 100vh;
+        background-color: #44444475;
+        &.hidden {
+            display: none;
+        }
+    }
+}
+
+
 .price_n_button {
     display: flex;
     flex-direction: column;
@@ -294,9 +388,9 @@ h2 {
     line-height: 22px;
     text-align: center;
     color: #ffffff;
-    transition: all 0.1s;
+    transition: all 0.2s;
     &:hover{
-        scale: 1.02;
+        box-shadow: #000 2px 2px 2px 2px;
     }
     &:active {
         box-shadow: 2px 2px 2px 2px;
@@ -927,7 +1021,10 @@ section.main_bottom p {
             width: 55%;
         }
         &_description {
+            word-break: break-word;
             padding-left: 10px;
+            height: 250px;
+            overflow-y: scroll;
         }
         &_order {
             display: flex;
@@ -1006,17 +1103,20 @@ section.main_bottom p {
         width: 100%;
         gap: 10px;
 
-        transition: opacity 0.5s, transform 0.5s, height 1.5s;
+        transition: opacity 0.5s, transform 0.5s, height 1.5s, scale 0.2s;
         opacity: 1;
         transform: translateY(0);
-
+        &:hover{
+            scale: 1.01;
+        }
         &_right {
             border-left: #000 solid 3px;
             padding-left: 10px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            line-break: anywhere;
+            word-break: break-word;
+            text-align: justify;
             & button {
                 width: 100%;
                 padding: 10px;

@@ -327,7 +327,7 @@ function change_button(id, element) {
         } else {
             button.outerHTML = `
             <div class="item_div__amount" data-itemid="${id}" data-itemType="div">
-                <img src="./img/trash_can.svg" alt="" onclick=delete_itemCart(${id})>
+                <img src="./img/trash_can.svg" class="delete_item" alt="" onclick=delete_itemCart(${id})>
                 <div class="item_div__amount_div">Добавлено: ${element.Count}</div>
                 <div class="add_to_cart__amount">
                     <button class="increase" data-itemid = "${id}">▲</button>
@@ -391,6 +391,11 @@ document.addEventListener("DOMContentLoaded", () => {
             IncrDecr(e, "cart")
         });
     } 
+    if (document.getElementById("history")) {
+        document.getElementById("history").addEventListener("click", function (e) {
+            historyAddOffer(e)
+        });
+    } 
 
     
 })
@@ -398,8 +403,11 @@ function IncrDecr(e, place) {
     const addBtn = e.target.closest(".add_to_cart");
     const increaseBtn = e.target.closest(".increase");
     const decreaseBtn = e.target.closest(".decrease");
+    const itemDiv = e.target.closest(".item_div");
+    const deleteItem = e.target.closest(".delete_item")
     if (addBtn || increaseBtn) {
         const id = parseInt(addBtn?.dataset.itemid || increaseBtn?.dataset.itemid, 10);
+        console.log("add");
         if (logg) {
             fetch("./php/add_offer.php", {
                 method: "POST",
@@ -423,7 +431,7 @@ function IncrDecr(e, place) {
                 console.log("Error: " + error);
             })
         } else {
-            console.log("Нужно войти");
+            alert("Нужно войти");
         }
         return;
     }
@@ -456,6 +464,82 @@ function IncrDecr(e, place) {
             console.log("Error: " + error);
         })
         return;
+    }
+    if (itemDiv && !deleteItem) {
+        openModal(itemDiv)
+    }
+}
+function openModal(div) {
+    fetch("./php/data.php")
+        .then(response => response.json())
+        .then(data => {
+            const current_item = div.dataset.modal;
+            let object = {};
+            console.log(current_item);
+            data.forEach(item => {
+                Number(item.id) == Number(current_item) ? object = item : console.log();
+            })
+            console.log(object);
+            console.log(object.id);
+            const modalBG = document.querySelector(".item_cardBG");
+            let string = ``
+            string += `<div class="item_card">
+            <div class="item_card_scrollable">
+                <div class="item_card_main">
+                    <div class="item_card_left">
+                        <img src="img/${object.Img_name}" alt="" class="item_div__img">
+                        <div>
+                            <p class="first_price">${object.Special_price || object.Price} руб.</p>
+                            ${object.Special_price ? `<p class="second_price">${object.Price} руб</p>` : ``}
+                        </div>
+                        <button class="add_to_cart" data-itemid = "${object.id}">В корзину</button>
+                    </div>
+                    <div class="item_card_descr">
+                        <div class="item_card_descr_top">
+                            <h3 class="">${object.Name}</h3>  
+                            <img src="./img/cross.svg" alt="" onclick="closeModal()">
+                        </div>
+                        
+                        <p class="item_card_descr_D">${object.Description || "Описание товара отсутствует"}</p>
+                    </div>
+                    
+                </div>
+            </div>
+            </div>`
+            modalBG.classList.remove("hidden");
+            modalBG.innerHTML = string;
+            return;
+        })
+        .catch(error => console.log(error))
+}
+function closeModal() {
+    const modal = document.querySelector(".item_cardBG")
+    console.log(modal);
+    modal.classList.add("hidden")
+}
+function historyAddOffer(e) {
+    console.log("history");
+    const button = e.target.closest(".add_to_cart");
+    const history_item = e.target.closest(".history__item");
+    if (button) {
+        fetch("./php/add_offer.php", {
+            method: "POST",
+            headers: {"Content-Type":"application/json"},
+            body: JSON.stringify(button.dataset.itemid)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert("Товар добавлен в корзину")
+                renderCart()
+            } else {
+                console.log(data.error);
+            }
+        })
+        .catch(error => console.log(error))
+    }
+    if (history_item && !button) {
+        openModal(history_item)
     }
 }
 
@@ -554,13 +638,13 @@ async function render_previousOffers() {
         offers.data.forEach(offer => {
             let renderData = renderMap.get(offer.Product_id)
             string += `
-            <div class="history__item">
+            <div class="history__item" data-modal="${offer.Product_id}">
                 <img src="./img/${renderData.Img_name}" alt="">
                 <div class="history__item_right">
                     <p>Название: ${renderData.Name}</p>
                     <p>Дата заказа: ${offer.Date} </p>
                     <p>Описание: ${renderData.Desciption || "Описание товара нет"}</p>
-                    <button>Добавить в корзину</button>
+                    <button class="add_to_cart" data-itemid = "${offer.Product_id}">Добавить в корзину</button>
                 </div>
             </div>
             `
@@ -643,7 +727,7 @@ function sales() {
         const filteredData = result.filter(item => item.Special_price != null)
         filteredData.forEach(item => {
         htmlInner += `
-            <div class="item_div">
+            <div class="item_div" data-modal = "${item.id}">
                 <img src="img/${item.Img_name}" alt="" class="item_div__img">
                 <p class="item_name">${item.Name}</p>
                 <div class="price_n_button">
@@ -696,7 +780,7 @@ function categories() {
             while (count < result.length - 1) {
                 if (item == result[count].Category) {
                     htmlInner +=`
-                    <div class="item_div">
+                    <div class="item_div" data-modal = "${result[count].id}">
                         <img src="img/${result[count].Img_name}" alt="" class="item_div__img">
                         <p class="item_name">${result[count].Name}</p>
                     <div class="price_n_button">`;
@@ -755,7 +839,7 @@ function sortByPrice() {
         let htmlInner = '<section class="categories__grid bottom_margin_123px center">'; // Start new section
         items.forEach(item => {
             htmlInner += `
-            <div class="item_div">
+            <div class="item_div" data-modal = "${item.id}">
                 <img src="img/${item.Img_name}" alt="" class="item_div__img">
                 <p class="item_name">${item.Name}</p>
                 <div class="price_n_button">
