@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="header_mass" data-header="Login">
+    </header>
+    <Main>
+    <div class="bread_crumbs bread_crumbs_withbd">
+        <a href="index.html">Главная</a>
+        <p>/ Личный кабинет</p>
+    </div>
+    <section class="PA__top" data-PA = "personal">
+        <div class="PA__top_div">
+            <h1>Добро пожаловать, <span id="username">...</span></h1>
+            <button onclick="window.location.href='./php/logout.php'" class="PA__logout">Выйти из профиля</button>
+        </div>
+        <div class="PA__top_div">
+            <p>Ваше имя: <span id="userName"></span> <button class="edit-btn PA__top_edit" data-field="Name">изменить</button></p>
+            <p>Ваша почта: <span id="userEmail">пп****пп@gg.g</span> <button class="edit-btn PA__top_edit" data-field="Email">изменить</button></p>
+            <p>Телефон: <span id="userPhone">+7**********</span> <button class="edit-btn PA__top_edit" data-field="Phone">изменить</button></p>
+        </div>
+        <div id="adminPanel" class="admin_panel hidden">
+                    
+        </div>
+    </section>
+   
+    <section class="PA__cart center" data-PA ="cart">
+        
+        <div class="cart__top">
+            <h1>Корзина</h1>
+            <div>
+                <button onclick="delete_itemCart('all')">Очистить</button>
+                <button onclick="orderCart('all')">Заказать все</button>
+            </div>
+            
+        </div>
+        <section class="cart" id="cart">
+            
+        </section>
+
+        
+    </section>
+    <section class="PA__history center" id="history">
+        <div class="history__top">
+            <h1>Ваши прошлые заказы</h1>
+            <button data-display="grid" id="hide_button" onclick="hide_offers()">Скрыть</button>
+        </div>
+        <section class="history__section" id="history__section">
+            <div class="history__item">
+                <img src="./img/PROTEIN/2.jpg" alt="">
+                <div class="history__item_right">
+                    <p>Название: ggggggggggggggg</p>
+                    <p>Цена: 55555 pyb</p>
+                    <p>Дата заказа: 24.04.2024</p>
+                    <p>Описание: 5555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555</p>
+                    <button>Добавить в корзину</button>
+                </div>
+            </div>
+            
+        </section>
+            
+        
+    </section>
+    <div class="item_cardBG hidden">
+    </div>
+    </Main>
+    <footer class="footer">
+    </footer>
+    
+    <script src="./script.js"></script>
+</body>
+</html>

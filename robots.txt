@@ -1,0 +1,5 @@
+User-agent: *
+Disallow: /php/
+Disallow: /Login_form.html
+
+Sitemap: https://yourdomain.com/sitemap.xml

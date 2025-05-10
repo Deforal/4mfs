@@ -3,8 +3,8 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: 127.0.0.1:3306
--- Время создания: Дек 04 2024 г., 05:46
--- Версия сервера: 10.1.48-MariaDB
+-- Время создания: Апр 03 2025 г., 06:08
+-- Версия сервера: 8.0.30
 -- Версия PHP: 7.2.34
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
@@ -28,12 +28,12 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `Feedback` (
-  `id` int(11) NOT NULL,
-  `Name` varchar(30) NOT NULL,
-  `E-mail` varchar(100) NOT NULL,
-  `Phone` varchar(15) NOT NULL,
-  `Comment` text NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+  `id` int NOT NULL,
+  `Name` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `E-mail` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `Phone` varchar(15) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `Comment` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -42,9 +42,21 @@ CREATE TABLE `Feedback` (
 --
 
 CREATE TABLE `Offers` (
-  `Product_id` int(11) NOT NULL,
-  `User_id` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+  `Offer_id` int NOT NULL,
+  `Product_id` int NOT NULL,
+  `User_id` int NOT NULL,
+  `Stage` varchar(20) COLLATE utf8mb4_general_ci NOT NULL,
+  `Count` int NOT NULL DEFAULT '1'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Дамп данных таблицы `Offers`
+--
+
+INSERT INTO `Offers` (`Offer_id`, `Product_id`, `User_id`, `Stage`, `Count`) VALUES
+(32, 3, 15, 'в обработке', 1),
+(33, 4, 15, 'в обработке', 1),
+(35, 3, 16, 'в корзине', 2);
 
 -- --------------------------------------------------------
 
@@ -53,14 +65,14 @@ CREATE TABLE `Offers` (
 --
 
 CREATE TABLE `Products` (
-  `id` int(11) NOT NULL,
-  `Name` varchar(255) NOT NULL,
-  `Img_name` varchar(25) NOT NULL,
-  `Special_price` varchar(10) DEFAULT NULL,
-  `Price` varchar(10) NOT NULL,
-  `Desciption` text,
-  `Category` varchar(25) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+  `id` int NOT NULL,
+  `Name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `Img_name` varchar(25) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `Special_price` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `Price` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `Desciption` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci,
+  `Category` varchar(25) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Дамп данных таблицы `Products`
@@ -132,19 +144,21 @@ INSERT INTO `Products` (`id`, `Name`, `Img_name`, `Special_price`, `Price`, `Des
 --
 
 CREATE TABLE `Users` (
-  `id` int(11) NOT NULL,
-  `role` int(11) NOT NULL DEFAULT '0',
-  `Email` text NOT NULL,
-  `Name` varchar(255) NOT NULL,
-  `Password` varchar(255) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+  `id` int NOT NULL,
+  `role` int NOT NULL DEFAULT '0',
+  `Email` text COLLATE utf8mb4_general_ci NOT NULL,
+  `Phone` varchar(15) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `Name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `Password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Дамп данных таблицы `Users`
 --
 
-INSERT INTO `Users` (`id`, `role`, `Email`, `Name`, `Password`) VALUES
-(9, 0, 'errte@ggg.fgh', 'fff', '$2y$10$9a5APe8dysxgBVCXJsOsYu8pPnmBf/Ngk.w0P91JswRqeit6pA4y2');
+INSERT INTO `Users` (`id`, `role`, `Email`, `Phone`, `Name`, `Password`) VALUES
+(15, 1, 'g@g.gh', '+79501197803', 'g', '$2y$10$JYZNz9ZM6xSc/SrBPAUyJOwVmsCWVpeSpoIDxMVEsyXXaEw0hSJQe'),
+(16, 0, 'g@gg.g', NULL, 'g', '$2y$10$vUZtAelyxyWCn6mdv432ueup3Pk2Jq4X9fE7YlWsgrmxqj04wmAFu');
 
 --
 -- Индексы сохранённых таблиц
@@ -160,6 +174,7 @@ ALTER TABLE `Feedback`
 -- Индексы таблицы `Offers`
 --
 ALTER TABLE `Offers`
+  ADD PRIMARY KEY (`Offer_id`),
   ADD KEY `Product_id` (`Product_id`),
   ADD KEY `User_id` (`User_id`);
 
@@ -183,19 +198,25 @@ ALTER TABLE `Users`
 -- AUTO_INCREMENT для таблицы `Feedback`
 --
 ALTER TABLE `Feedback`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT для таблицы `Offers`
+--
+ALTER TABLE `Offers`
+  MODIFY `Offer_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
 
 --
 -- AUTO_INCREMENT для таблицы `Products`
 --
 ALTER TABLE `Products`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=69;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=81;
 
 --
 -- AUTO_INCREMENT для таблицы `Users`
 --
 ALTER TABLE `Users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- Ограничения внешнего ключа сохраненных таблиц
@@ -205,8 +226,8 @@ ALTER TABLE `Users`
 -- Ограничения внешнего ключа таблицы `Offers`
 --
 ALTER TABLE `Offers`
-  ADD CONSTRAINT `offers_ibfk_1` FOREIGN KEY (`Product_id`) REFERENCES `gh`.`Products` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `offers_ibfk_2` FOREIGN KEY (`User_id`) REFERENCES `gh`.`Users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `offers_ibfk_1` FOREIGN KEY (`Product_id`) REFERENCES `Products` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `offers_ibfk_2` FOREIGN KEY (`User_id`) REFERENCES `Users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

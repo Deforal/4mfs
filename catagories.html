@@ -8,50 +8,34 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet"> 
     <link rel="stylesheet" href="style.css">
-    <script src="script.js"></script>
-    <title>Главная</title>
+    <title>Категории</title>
 </head>
 <body>
-<header class="header_mass">
-    <div class="top_else">
-        <div class="top__logo">
-            <a href="main.html"><img src="img/layer1.svg" alt=""></a>
-        </div>
-        <nav class="top__nav">
-            <a href="catagories.html" class="top__nav_category">Категории</a>
-            <a href="Login_form.html" class="top__nav_category registration-link">Регистрация/Вход</a>
-        </nav>
-    </div>
+<header class="header_mass" data-header="categories">
+    
 </header>
 <Main>
 <div class="bread_crumbs bread_crumbs_withbd">
-    <a href="main.html">Главная</a>
+    <a href="index.html">Главная</a>
     <p>/ Категории</p>
 </div>
-<div id="modalContainer"></div>
 <div class="center categories__buttons" >
-     <button onclick="categories()" class="categories__sorting_button">Товары по категориям</button>
-     <button onclick="sales()" class="categories__sorting_button">Скидки</button>
-     <button onclick="sortByPrice()" class="categories__sorting_button">Сортировать по цене (Возрастание|Убывание)</button>
+     <button onclick="categories()" id="categories" class="categories__sorting_button">Товары по категориям</button>
+     <button onclick="sales()" id="sales" class="categories__sorting_button">Скидки</button>
+     <button onclick="sortByPrice()" id="sort_categories" class="categories__sorting_button">Сортировать по цене (Возрастание|Убывание)</button>
 </div>
+<script src="./script.js"></script>
 <div id="categories__grid">
     <script>categories()</script>
 </div>
+<div class="item_cardBG hidden">
+</div>
+
 </Main>
+
+
 <footer class="footer">
-    <div class="footer__logo">
-        <a href="main.html"><img src="img/layer1.svg" alt=""></a>
-    </div>
-    <nav class="footer__nav">
-        <div class="footer__nav_links">
-            <a href="manufactors.html">Производители</a>
-            <a href="delivery.html">Доставка</a>
-            <a href="payment.html">Оплата</a>
-            <a href="contacts.html">Обратная связь</a>
-        </div>
-        <p>г.Иркутск, ул. Баррикад, д. 147 Телефон: (8924) 70-11-548  e-mail: epikego@mail.ru</p>
-    </nav>
+    
 </footer>
-<script src="script.js"></script>
 </body>
 </html>

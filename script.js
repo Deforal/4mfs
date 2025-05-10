@@ -1,5 +1,719 @@
+"use strict";
+let logg
+function checkAuthStatus() {
+    return fetch("./php/auth.php")
+    .then(response => response.json())
+    .then(data => {
+        console.log("Auth status:", data);
+        if (data.loggedIn) {
+            logg = "user";
+            if (data.user.role == "1") {
+                logg = "admin"
+            }
+        }
+    })
+    .catch(error => console.error("Error checking login status:", error));
+}
+function header() {
+    const header = document.querySelector("header")
+    if (header.classList == "header") {
+        header.innerHTML = `<div class="top">
+        <div class="top__logo">
+            <a href="index.html"><img src="img/layer1.svg" alt=""></a>
+        </div>
+        <nav class="top__nav">
+            <a href="catagories.html" class="top__nav_category">Категории</a>
+            <a href="${logg ? "PA.html" : "Login_form.html"}" class="top__nav_sales">
+                ${logg ? "Личный кабинет" : "Вход/Регистрация"}
+            </a>
+        </nav>
+        </div>`
+    } else {
+        let content = `
+        <div class="top_else">
+            <div class="top__logo">
+                <a href="index.html"><img src="img/layer1.svg" alt=""></a>
+            </div>
+            <nav class="top__nav">
+            `
+            if (header.dataset.header == "Login") {
+                content += `
+                <a href="catagories.html" class="top__nav_category">Категории</a>
+                `
+            } else if (header.dataset.header == "categories") {
+                content +=`
+                <a href="${logg ? "PA.html" : "Login_form.html"}" class="top__nav_sales">
+                ${logg ? "Личный кабинет" : "Вход/регистрация"}
+                </a>
+                `
+            }  else {
+                content +=`
+                <a href="catagories.html" class="top__nav_category">Категории</a>
+                <a href="${logg ? "PA.html" : "Login_form.html"}" class="top__nav_sales">
+                    ${logg ? "Личный кабинет" : "Вход/Регистрация"}
+                </a>
+                `
+            }
+            
+        content += `</nav> </div>`
+        header.innerHTML += content
+    }
+    
+}
+function footer() {
+    const footer = document.querySelectorAll(".footer")
+    footer.forEach(element => {
+        element.innerHTML += `
+        <div class="footer__logo">
+        <a href="index.html"><img src="img/layer1.svg" alt=""></a>
+        </div>
+        <nav class="footer__nav">
+            <div class="footer__nav_links">
+                <a href="manufactors.html">Производители</a>
+                <a href="delivery.html">Доставка</a>
+                <a href="payment.html">Оплата</a>
+                <a href="contacts.html">Обратная связь</a>
+            </div>
+            <p>г.Иркутск, ул. Баррикад, д. 147 Телефон: (8924) 70-11-548  e-mail: epikego@mail.ru</p>
+        </nav>`
+    });
+}
+
+checkAuthStatus().then(() => {
+    header();
+    footer();
+})
+
+document.addEventListener("DOMContentLoaded", () => {
+    if (document.querySelector("[data-PA='personal']")) {
+        PA_info();
+        renderCart();
+        render_previousOffers();
+        document.querySelectorAll(".edit-btn").forEach(button => {
+            button.addEventListener("click", () => showForm(button.dataset.field));
+        });
+    }  
+});
+function PA_info() {
+    fetch("./php/auth.php")
+    .then(response => response.json())
+    .then(data => {
+        console.log("Auth status:", data);
+        if (data.loggedIn) {
+            document.getElementById("userName").textContent = data.user.name;
+            document.getElementById("username").textContent = data.user.name;
+            document.getElementById("userEmail").textContent = data.user.email;
+            const phone = document.getElementById("userPhone");
+            data.user.phone ? phone.textContent = data.user.phone : phone.textContent = "Номера телефона не прикреплен"
+            if (data.user.role == "1") {
+                document.getElementById("adminPanel").classList.remove("hidden");
+                showAdminPanel();
+            }
+        }
+    })
+    .catch(error => console.error("Error checking login status:", error));
+}
+function showForm(field) {
+    let fieldSpan = document.getElementById(`user${field}`);
+    if (!fieldSpan) return;
+
+    let currentValue = fieldSpan.textContent.trim();
+    let formContainer = fieldSpan.parentElement;
+    
+    formContainer.innerHTML = `
+        <span id="user${field}">
+            <input class="PA__top_input" type="text" id="new${field}" value="${currentValue == "Номера телефона не прикреплен" ? '' : currentValue}" maxlength="${field == 'Name' ? '20' : field == 'Phone' ? '13' : ''}" ${field == "Phone" ? 'placeholder = "+7988-888-88-88"' : ''}>
+        </span>
+        <button class="PA__top_edit" onclick="updateUser('${field}')">Сохранить</button>
+        <button class="PA__top_edit" onclick="cancelEdit('${field}', '${currentValue}')">Отмена</button>
+    `;
+}
+
+function cancelEdit(field, originalValue) {
+    let formContainer = document.getElementById(`user${field}`).parentElement;
+    let string = "";
+    if (field == "Email") {
+        string += "Ваша почта:"
+    } else if (field == "Phone") {
+        string += "Телефон: "
+    } else {
+        string += "Ваше имя: "
+    }
+    string += `
+        <span id="user${field}">${originalValue}</span> 
+        <button class="edit-btn PA__top_edit" data-field="${field}">изменить</button>
+    `;
+    formContainer.innerHTML = string;
+    if (field == "Name") {
+        document.getElementById("username").innerHTML = originalValue
+    }
+    formContainer.querySelector(".edit-btn").addEventListener("click", () => showForm(field));
+}
+
+function updateUser(field) {
+    let inputField = document.getElementById(`new${field}`);
+    if (!inputField) {return;}
+
+    let newValue = inputField.value.trim();
+    if (!newValue) {
+        alert("Поле не может быть пустым.");
+        return;
+    }
+
+    fetch("./php/update_user.php", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ field: field, value: newValue })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            cancelEdit(field, data.newValue); // Update UI with new value
+            alert("Данные изменены!")
+        } else {
+            alert(data.error);
+        }
+    })
+    .catch(error => {
+        console.error("Ошибка:", error);
+        alert("Произошла ошибка. Попробуйте еще раз.");
+    });
+}
+
+function showAdminPanel() {
+    fetch("./php/data.php")
+        .then(response => response.json())
+        .then(products => {
+            const adminPanel = document.getElementById("adminPanel");
+            adminPanel.innerHTML = `
+                <h2>Админ панель</h2>
+                <table border="1">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Название</th>
+                            <th>Особая цена</th>
+                            <th>Цена</th>
+                            <th>Описание</th>
+                            <th>Категория</th>
+                            <th>Удалить</th>
+                        </tr>
+                    </thead>
+                    <tbody id="productTableBody"></tbody>
+                </table>
+                <button onclick="addProduct()">Добавить товар</button>
+            `;
+
+            const tableBody = document.getElementById("productTableBody");
+
+            products.forEach(product => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${product.id}</td>
+                    <td contenteditable="true" onblur="editProduct(${product.id}, 'Name', this)">${product.Name}</td>
+                    <td contenteditable="true" onblur="editProduct(${product.id}, 'Special_price', this)">
+                        ${product.Special_price ? product.Special_price : "No sale"}
+                    </td>
+                    <td contenteditable="true" onblur="editProduct(${product.id}, 'Price', this)">${product.Price}</td>
+                    <td contenteditable="true" onblur="editProduct(${product.id}, 'Desciption', this)">${product.Desciption}</td>
+                    <td contenteditable="true" onblur="editProduct(${product.id}, 'Category', this)">${product.Category}</td>
+                    <td>
+                        <button onclick="deleteProduct(${product.id})">Delete</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+
+            adminPanel.classList.remove("hidden");
+        })
+        .catch(error => console.error("Error fetching products:", error));
+}
+
+function deleteProduct(id) {
+    if (!confirm("Are you sure you want to delete this product?")) return;
+
+    fetch("./php/delete_product.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: id })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert("Product deleted");
+            showAdminPanel();
+        } else {
+            alert("Error: " + data.error);
+        }
+    })
+    .catch(error => console.error("Error deleting product:", error));
+}
+
+function addProduct() {
+    const name = prompt("Enter product name:");
+    if (!name) return;
+
+    const specialPrice = prompt("Enter special price (leave empty for no sale):");
+    const price = prompt("Enter price:");
+    if (!price || isNaN(price)) {
+        alert("Invalid price.");
+        return;
+    }
+
+    const desc = prompt("Enter description:");
+    const category = prompt("Enter category:");
+
+    fetch("./php/add_product.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            name: name,
+            special_price: specialPrice || null,
+            price: parseFloat(price),
+            desc: desc,
+            category: category
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert("Product added");
+            showAdminPanel();
+        } else {
+            alert("Error: " + data.error);
+        }
+    })
+    .catch(error => console.error("Error adding product:", error));
+}
+
+
+function editProduct(id, field, element) {
+    const newValue = element.textContent.trim();
+
+    fetch("./php/edit_product.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, field, value: newValue })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            console.error("Error editing product:", data.error);
+            alert("Ошибка: " + data.error);
+        } else {
+            console.log("Product updated:", data.success);
+        }
+    })
+    .catch(error => console.error("Fetch error:", error));
+}
+
+function change_button(id, element) {
+    const button = document.querySelector(`[data-itemid="${id}"]`)
+    if (element) {
+        if (element.place =="cart") {
+            const amount = button.querySelector(".cart__item_left_amount")
+            const column = amount.parentElement
+            const price = column.querySelector(".cart__item_overall")
+            price.innerHTML = `Итого: ${price.dataset.price * element.Count} руб.`
+            amount.outerHTML = `
+            <div class="cart__item_left_amount">
+                <button class="increase" data-itemid = "${id}">▲</button>
+                <p><i class="cart__item_left_i">Количество: ${element.Count}</i></p>
+                <button class=${element.Count == 1 ? `"disabled_decrease" disabled` : "decrease"} data-itemid = "${id}">▼</button> 
+            </div>
+            `
+        } else {
+            button.outerHTML = `
+            <div class="item_div__amount" data-itemid="${id}" data-itemType="div">
+                <img src="./img/trash_can.svg" class="delete_item" alt="" onclick=delete_itemCart(${id})>
+                <div class="item_div__amount_div">Добавлено: ${element.Count}</div>
+                <div class="add_to_cart__amount">
+                    <button class="increase" data-itemid = "${id}">▲</button>
+                    <button class=${element.Count == 1 ? `"disabled_decrease" disabled` : "decrease"} data-itemid = "${id}">▼</button>  
+                </div>
+            </div>
+            `; 
+        }
+       
+    } else {
+        button.outerHTML = `<button class="add_to_cart" data-itemid = "${id}">В корзину</button>`;
+    }
+    
+}
+function change_amount(id, object) {
+    let div = 0;
+    div = document?.querySelector(`[data-itemid="${id}"]`)
+    if (object.place == "cart") {
+        const amount = div.querySelector(".cart__item_left_i")
+        amount.innerHTML = `Количество: ${object.Count}` 
+        const column = amount.parentElement.parentElement.parentElement
+        const price = column.querySelector(".cart__item_overall")
+        price.innerHTML = `Итого: ${price.dataset.price * object.Count} руб.`
+    } else {
+        const amount = div.querySelector(".item_div__amount_div")
+        amount.innerHTML = `Добавлено: ${object.Count}` 
+    }
+    
+    
+}
+function addToCart() {
+    fetch("./php/get_cart.php")
+    .then(response => response.json())
+    .then(data => {
+        const cartMap = new Map();
+        data.data.forEach(item => {
+            cartMap.set(String(item.Product_id), item);
+        });
+        const itemDivs = document.querySelectorAll(".item_div");
+        itemDivs.forEach(div => {
+            const buttonEl = div.querySelector("[data-itemid]");
+            const itemId = buttonEl?.dataset.itemid;
+            if (itemId && cartMap.has(itemId)) {
+                change_button(itemId, cartMap.get(itemId));
+            }
+        });
+    })
+    .catch(error => {
+        console.log(error);
+    })
+    // const button = document.querySelector(`.add_to_cart[data-itemid="${id}"]`);
+}
+document.addEventListener("DOMContentLoaded", () => {
+    if (document.getElementById("categories__grid")) {
+        document.getElementById("categories__grid").addEventListener("click", function (e) {
+            IncrDecr(e, "categories")
+        });
+    } 
+    if (document.getElementById("cart")) {
+        document.getElementById("cart").addEventListener("click", function (e) {
+            IncrDecr(e, "cart")
+        });
+    } 
+    if (document.getElementById("history")) {
+        document.getElementById("history").addEventListener("click", function (e) {
+            historyAddOffer(e)
+        });
+    } 
+
+    
+})
+function IncrDecr(e, place) {
+    const addBtn = e.target.closest(".add_to_cart");
+    const increaseBtn = e.target.closest(".increase");
+    const decreaseBtn = e.target.closest(".decrease");
+    const itemDiv = e.target.closest(".item_div");
+    const deleteItem = e.target.closest(".delete_item")
+    if (addBtn || increaseBtn) {
+        const id = parseInt(addBtn?.dataset.itemid || increaseBtn?.dataset.itemid, 10);
+        console.log("add");
+        if (logg) {
+            fetch("./php/add_offer.php", {
+                method: "POST",
+                headers: {"Content-Type":"application/JSON"},
+                body: JSON.stringify(id)
+            })
+            .then(response => response.json())
+            .then(data => {
+                const object = {}
+                if (data.data.Count <= 2) {
+                    object.Count = data.data.Count
+                    object.place = place
+                    change_button(id, object)
+                } else {
+                    object.Count = data.data.Count
+                    object.place = place
+                    change_amount(id, object)
+                }
+            })
+            .catch(error => {
+                console.log("Error: " + error);
+            })
+        } else {
+            alert("Нужно войти");
+        }
+        return;
+    }
+
+    if (decreaseBtn) {
+        const id = Number(decreaseBtn.dataset.itemid)
+        fetch("./php/decrease_amount.php", {
+            method: "POST",
+            headers: {"Content-Type":"application/JSON"},
+            body: JSON.stringify(id)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const object = {}
+                if (data.data.Count == 1) {
+                    object.Count = data.data.Count
+                    object.place = place
+                    change_button(id, object)
+                } else {
+                    object.Count = data.data.Count
+                    object.place = place
+                    change_amount(id, object)
+                }
+            } else {
+                console.log(data.error);
+            }
+        })
+        .catch(error => {
+            console.log("Error: " + error);
+        })
+        return;
+    }
+    if (itemDiv && !deleteItem) {
+        openModal(itemDiv)
+    }
+}
+function openModal(div) {
+    fetch("./php/data.php")
+        .then(response => response.json())
+        .then(data => {
+            const current_item = div.dataset.modal;
+            let object = {};
+            console.log(current_item);
+            data.forEach(item => {
+                Number(item.id) == Number(current_item) ? object = item : console.log();
+            })
+            console.log(object);
+            console.log(object.id);
+            const modalBG = document.querySelector(".item_cardBG");
+            let string = ``
+            string += `<div class="item_card">
+            <div class="item_card_scrollable">
+                <div class="item_card_main">
+                    <div class="item_card_left">
+                        <img src="img/${object.Img_name}" alt="" class="item_div__img">
+                        <div>
+                            <p class="first_price">${object.Special_price || object.Price} руб.</p>
+                            ${object.Special_price ? `<p class="second_price">${object.Price} руб</p>` : ``}
+                        </div>
+                        <button class="add_to_cart" data-itemid = "${object.id}">В корзину</button>
+                    </div>
+                    <div class="item_card_descr">
+                        <div class="item_card_descr_top">
+                            <h3 class="">${object.Name}</h3>  
+                            <img src="./img/cross.svg" alt="" onclick="closeModal()">
+                        </div>
+                        
+                        <p class="item_card_descr_D">${object.Description || "Описание товара отсутствует"}</p>
+                    </div>
+                    
+                </div>
+            </div>
+            </div>`
+            modalBG.classList.remove("hidden");
+            modalBG.innerHTML = string;
+            return;
+        })
+        .catch(error => console.log(error))
+}
+function closeModal() {
+    const modal = document.querySelector(".item_cardBG")
+    console.log(modal);
+    modal.classList.add("hidden")
+}
+function historyAddOffer(e) {
+    console.log("history");
+    const button = e.target.closest(".add_to_cart");
+    const history_item = e.target.closest(".history__item");
+    if (button) {
+        fetch("./php/add_offer.php", {
+            method: "POST",
+            headers: {"Content-Type":"application/json"},
+            body: JSON.stringify(button.dataset.itemid)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert("Товар добавлен в корзину")
+                renderCart()
+            } else {
+                console.log(data.error);
+            }
+        })
+        .catch(error => console.log(error))
+    }
+    if (history_item && !button) {
+        openModal(history_item)
+    }
+}
+
+async function renderCart() {
+    try {
+        const response = await fetch("./php/get_cart.php");
+        if (!response.ok) {
+            console.log("Response wasn't okay: " + response.statusText);
+            return;
+        }
+        const cartData = await response.json();
+
+        const response1 = await fetch("./php/data.php");
+        if (!response1.ok) {
+            console.log("Response wasn't okay: " + response1.statusText);
+            return;
+        }
+        const productsData = await response1.json();
+
+        let productCount = {};
+        cartData.data.forEach(cartItem => {
+            const id = cartItem.Product_id;
+            productCount[id] = cartItem.Count;
+        });
+        
+        // Step 2: Filter unique products from productsData
+        let matchedProducts = productsData
+            .filter(product => productCount[product.id]) // Keep only those in the cart
+            .map(product => ({
+                ...product, // Keep product details
+                count: productCount[product.id] // Attach count from cart
+            }));
+        let htmlInner = "";
+        matchedProducts.forEach(item => {
+            htmlInner += `
+            <div class="cart__item" data-cartProduct = "${item.id}">
+                <div class="cart__item_left">
+                    <img src="./img/${item.Img_name}" alt="${item.Name}">
+                    <div class="cart__item_left_column" data-itemid = "${item.id}">
+                        <p class ="cart__item_left_name"> Название: <b>${item.Name}</b></p>
+                        <p>Цена: <b> ${item.Special_price || item.Price} руб. </b></p>
+                        ${ item.Special_price ? `<p class="second_price"> Цена без акции: ${item.Price} руб.</p>` : ''}
+                        <div class="cart__item_left_amount">
+                            <button class="increase" data-itemid = "${item.id}">▲</button>
+                            <p><i class="cart__item_left_i">Количество: ${item.count}</i></p>
+                            <button class=${item.count == 1 ? `"disabled_decrease" disabled` : "decrease"} data-itemid = "${item.id}">▼</button> 
+                        </div>
+                        <p class="cart__item_overall" data-price="${item.Special_price || item.Price}">Итого: ${item.count * (item.Special_price || item.Price)} руб.</p>
+                    </div>
+                </div>
+                <div class="cart__item_right">
+                    <p class="cart__item_description">Описание: ${item.Description || "Описание товара отсутствует"}</p>
+                    <div class="cart__item_order">
+                        <button onclick=orderCart(${item.id})>Заказать</button>
+                        <button onclick=delete_itemCart(${item.id})>Удалить</button>
+                    </div>
+                    
+                </div>
+            </div>`
+        })
+        const cartDiv = document.querySelector(".cart");
+        cartDiv.innerHTML = htmlInner;
+        
+    } catch (error) {
+        console.log("Error: " + error);
+    }
+}
+async function render_previousOffers() {
+    try {
+        const prevOffers = await fetch("./php/prevOffers.php")
+        const offers = await prevOffers.json();
+        console.log(offers);
+        if (offers.error) {
+            console.log(offers.error);
+            return;
+        }
+        const products_fetch = await fetch("./php/data.php")
+        const products = await products_fetch.json();
+        console.log(products);
+        if (products.error) {
+            console.log(products.error);
+            return;
+        }
+        const cartMap = new Map();
+        offers.data.forEach(item => {
+            cartMap.set(item.Product_id, item)
+        })
+        console.log(cartMap);
+        const matching_products = products.filter(product => cartMap.has(Number(product.id)))
+        const renderMap = new Map();
+        matching_products.forEach(item => {
+            renderMap.set(Number(item.id), item)
+        })
+        const section = document.querySelector(".history__section")
+        let string = "";
+        offers.data.forEach(offer => {
+            let renderData = renderMap.get(offer.Product_id)
+            string += `
+            <div class="history__item" data-modal="${offer.Product_id}">
+                <img src="./img/${renderData.Img_name}" alt="">
+                <div class="history__item_right">
+                    <p>Название: ${renderData.Name}</p>
+                    <p>Дата заказа: ${offer.Date} </p>
+                    <p>Описание: ${renderData.Desciption || "Описание товара нет"}</p>
+                    <button class="add_to_cart" data-itemid = "${offer.Product_id}">Добавить в корзину</button>
+                </div>
+            </div>
+            `
+        })
+        section.innerHTML = string;
+    } catch (error) {
+        console.log(error);
+    }
+    
+}
+function hide_offers() {
+    const button = document.getElementById("hide_button");
+    const section = document.getElementById("history__section");
+    const items = section.querySelectorAll(".history__item")
+    console.log(section);
+    if (button.dataset.display == "grid") {
+        items.forEach(item => {
+            item.classList.add("hidden");
+        });
+        section.classList.add("hidden");
+        button.innerText = "Показать";
+        button.dataset.display = "none";
+    } else {
+        items.forEach(item => {
+            item.classList.remove("hidden");
+        });
+        section.classList.remove("hidden");
+        button.innerText = "Скрыть";
+        button.dataset.display = "grid";
+    }
+}
+async function orderCart(id) {
+    try {
+        const ordering = await fetch("./php/order_cart.php", {
+            method: "POST",
+            headers: {"Content-Type":"application/JSON"},
+            body: JSON.stringify(id)
+        })
+        const success = await ordering.json();
+        success.success == true ? alert("Заказ оформлен") : alert(success.error)
+        renderCart();
+    } catch (error) {
+        console.log("Error" + error);
+    }
+}
+
+async function delete_itemCart(id) {
+    try {
+        let post;
+        id == "all" ? post = "all" : post = id;
+        const ordering = await fetch("./php/delete_itemCart.php", {
+            method: "POST",
+            headers: {"Content-Type":"application/JSON"},
+            body: JSON.stringify(post)
+        })
+        const success = await ordering.json();
+        if(document.querySelector('[data-PA ="cart"]')) {
+            renderCart(); 
+        } else {
+            change_button(id)
+            addToCart()
+        }
+    } catch (error) {
+        console.log("Error" + error);
+    }
+}
+    
 function sales() {
-    fetch('data.php')
+    fetch('./php/data.php')
     .then(response => {
         if (!response.ok) {
             throw new Error('Network response was not ok ' + response.statusText);
@@ -13,7 +727,7 @@ function sales() {
         const filteredData = result.filter(item => item.Special_price != null)
         filteredData.forEach(item => {
         htmlInner += `
-            <div class="item_div">
+            <div class="item_div" data-modal = "${item.id}">
                 <img src="img/${item.Img_name}" alt="" class="item_div__img">
                 <p class="item_name">${item.Name}</p>
                 <div class="price_n_button">
@@ -21,12 +735,13 @@ function sales() {
                         <p class="first_price">${item.Special_price} руб.</p>
                         <p class="second_price">${item.Price} руб</p>
                     </div>
-                    <button class="add_to_cart">В корзину</button>
+                    <button class="add_to_cart" data-itemid = "${item.id}">В корзину</button>
                 </div>
             </div>`
             }) 
         container.innerHTML = htmlInner
         htmlInner += '</section>';
+        addToCart();
     })
     .catch(error => {
         console.error('There was a problem with the fetch operation:', error);
@@ -34,7 +749,7 @@ function sales() {
     
 }
 function categories() {
-    fetch('data.php')
+    fetch('./php/data.php')
     .then(response => {
         if (!response.ok) {
             throw new Error('Network response was not ok ' + response.statusText);
@@ -42,6 +757,7 @@ function categories() {
         return response.json();
     })
     .then(result => {
+        console.log(result);
         const container = document.getElementById('categories__grid');
         let htmlInner = '';
         let currentCategory = '';
@@ -63,30 +779,22 @@ function categories() {
             htmlInner += '<section class="categories__grid bottom_margin_123px center">'; // Start new section
             while (count < result.length - 1) {
                 if (item == result[count].Category) {
+                    htmlInner +=`
+                    <div class="item_div" data-modal = "${result[count].id}">
+                        <img src="img/${result[count].Img_name}" alt="" class="item_div__img">
+                        <p class="item_name">${result[count].Name}</p>
+                    <div class="price_n_button">`;
                     if (result[count].Special_price !== null) {
-                        htmlInner +=`
-                        <div class="item_div">
-                            <img src="img/${result[count].Img_name}" alt="" class="item_div__img">
-                            <p class="item_name">${result[count].Name}</p>
-                            <div class="price_n_button">
-                                <div>
-                                    <p class="first_price">${result[count].Special_price} руб.</p>
-                                    <p class="second_price">${result[count].Price} руб</p>
-                                </div>
-                                <button class="add_to_cart">В корзину</button>
-                            </div>
-                        </div>`
+                        htmlInner += `<div>
+                            <p class="first_price">${result[count].Special_price} руб.</p>
+                            <p class="second_price">${result[count].Price} руб</p>
+                        </div> `;
                     } else {
-                        htmlInner += `
-                        <div class="item_div">
-                            <img src="img/${result[count].Img_name}" alt="" class="item_div__img">
-                            <p class="item_name">${result[count].Name}</p>
-                            <div class="price_n_button">
-                                <p class="first_price">${result[count].Price} руб.</p>
-                                <button class="add_to_cart">В корзину</button>
-                            </div>
-                        </div>`;
+                        htmlInner += `<p class="first_price">${result[count].Price} руб.</p>`;
                     }
+                    htmlInner +=`<button class="add_to_cart" data-itemid = "${result[count].id}">В корзину</button>
+                    </div>
+                    </div>`;
                 }
                 count++;
             }
@@ -95,6 +803,7 @@ function categories() {
 
         htmlInner += '</section>'; // Close the last section
         container.innerHTML = htmlInner;
+        addToCart();
     })
     .catch(error => {
         console.error('There was a problem with the fetch operation:', error);
@@ -104,7 +813,7 @@ function categories() {
 let price_switch = 1; // 1 for ascending, 0 for descending
 
 function sortByPrice() {
-    fetch('data.php')
+    fetch('./php/data.php')
     .then(response => {
         if (!response.ok) {
             throw new Error('Network response was not ok ' + response.statusText);
@@ -130,7 +839,7 @@ function sortByPrice() {
         let htmlInner = '<section class="categories__grid bottom_margin_123px center">'; // Start new section
         items.forEach(item => {
             htmlInner += `
-            <div class="item_div">
+            <div class="item_div" data-modal = "${item.id}">
                 <img src="img/${item.Img_name}" alt="" class="item_div__img">
                 <p class="item_name">${item.Name}</p>
                 <div class="price_n_button">
@@ -138,116 +847,111 @@ function sortByPrice() {
                         <p class="first_price">${item.Special_price !== null ? item.Special_price : item.Price} руб.</p>
                         ${item.Special_price !== null ? `<p class="second_price">${item.Price} руб</p>` : ''}
                     </div>
-                    <button class="add_to_cart">В корзину</button>
+                    <button class="add_to_cart" data-itemid = "${item.id}">В корзину</button>
                 </div>
             </div>`;
         });
         htmlInner += '</section>'; // Close section
         container.innerHTML = htmlInner;
+        addToCart();
     })
     .catch(error => {
         console.error('There was a problem with the fetch operation:', error);
     });
 }
-if (localStorage.getItem("LoggedIn") == "true") {
-    const reg_links = document.querySelectorAll(".registration-link")
-    reg_links.forEach(element => {
-        element.innerHTML = "Профиль"
-});
-}
-function Login_form() {
-    if (localStorage.getItem("LoggedIn") == "true") {
-        const reg_main = document.getElementById("reg__main")
-        reg_main.innerHTML = ` 
-        
-        
-        `
-    } else {
-        if (localStorage.getItem("LoggedIn") == "reg") {
-            const reg_main = document.getElementById("reg__main")
-            reg_main.innerHTML = `
-            <form action="register.php" method="post" class="reg__form center" id="reg_form">
-            <h2 class="payment_header center">Регистрация</h2> 
-            <p class="name_of_textbox center">E-mail:</p>
-            <input type="email" name="email" class="contacts_textbox" placeholder="example@mail.ru" required>
-            <p class="name_of_textbox center">Имя пользователя:</p>
-            <input type="text" name="username" class="contacts_textbox" placeholder="Имя пользователя" required>
-            <p class="name_of_textbox center">Пароль:</p>
-            <input type="password" name="password" class="contacts_textbox" required>
-            <p class="name_of_textbox center">Подтверждение пароля:</p>
-            <input type="password" name="confirm_password" class="contacts_textbox" required>
-            <button type="submit" class="contacts_submit">Отправить</button>
-            <a href="" class="reg__a" onclick="localStorage.setItem('LoggedIn', 'log')">Зарегестрироваться</a>
-            </form>
-            `
+document.addEventListener("DOMContentLoaded", () => {
+    if (document.querySelector("[data-form='log_reg']")) {
+        reg_form();
+        log_form();
+    }
+})
+function reg_form() {
+    document.getElementById("reg_form").addEventListener('submit', function(event) {
+    event.preventDefault()
+    const fields = document.querySelectorAll ('[data-register]')
+    const Allfields = {}
+    const element = document.querySelector(".form_error")
+    fields.forEach(field => {
+        if (field.value == '') {
+            field.style.backgroundColor = "rgba(255, 0, 0, 0.452)"
+            return;
         } else {
-            const reg_main = document.getElementById("reg__main")
-            reg_main.innerHTML = `
-            <form action="register.php" method="post" class="reg__form center" id="reg_form">
-            <h2 class="payment_header center">Вход</h2> 
-            <p class="name_of_textbox center">Логин:</p>
-            <input type="pas" name="" class="contacts_textbox" placeholder="E-mail или имя пользователя">
-            <p class="name_of_textbox center">Пароль:</p>
-            <input type="password" name="" class="contacts_textbox">
-            <button type="submit" class="contacts_submit">Отправить</button>
-            <a href="" class="reg__a" onclick="localStorage.setItem('LoggedIn', 'reg')">Войти</a>
-            </form>
-            `
-        }
-    }
-}
-document.getElementById('reg_form').addEventListener('submit', function(event) {
-    event.preventDefault(); // Prevent the default form submission
-
-    // Get form values
-    const email = document.querySelector('input[name="email"]').value.trim();
-    const username = document.querySelector('input[name="username"]').value.trim();
-    const password = document.querySelector('input[name="password"]').value.trim();
-    const confirmPassword = document.querySelector('input[name="confirm_password"]').value.trim();
-
-    // Validate form fields
-    if (!email || !username || !password || !confirmPassword) {
-        alert("Please fill in all fields.");
-        return;
-    }
-
-    if (password !== confirmPassword) {
-        alert("Passwords do not match.");
-        return;
-    }
-
-    // Prepare data to be sent
-    const formData = new FormData();
-    formData.append('email', email);
-    formData.append('username', username);
-    formData.append('password', password);
-
-    // Send data to PHP script using fetch API
-    fetch('register.php', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            alert("Registration successful!");
-            localStorage.setItem("LoggedIn", "true")
-            // const registrationLink = document.querySelectorAll('.registration-link');
-            // registrationLink.forEach(element => {
-            //     if (element) {
-            //         element.href = 'new_link.html'; // Replace with your desired link
-            //         element.textContent = 'New Link Text'; // Optionally change the link text
-            //     }
-            // });
+            Allfields[field.dataset.register] = field.value
+            field.style.backgroundColor = ""
             
-            // Optionally redirect to another page
-            window.location.href = 'main.html';
-        } else {
-            alert("Registration failed: " + data.message);
         }
     })
-    .catch(error => {
-        console.error('Error:', error);
-        alert("There was an error with the registration.");
-    });
-});
+
+    if (Allfields.Rpassword !== Allfields.password) {
+        element.style.display = "block"
+        element.textContent = "Пароли не совпадают"
+        return;
+    } else {
+        element.style.display = "none"
+    }
+    delete Allfields.Rpassword;
+    fetch("./php/register.php", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(Allfields)
+    })
+    .then(response => response.json()) 
+    .then(data => {
+        let jsonData = data;
+        console.log(jsonData);
+        if (jsonData.success) {
+            element.style.display = "none";
+            alert(jsonData.success); 
+            window.location.href = "PA.html"
+        } else {
+            element.style.display = "block";
+            element.textContent = jsonData.error;
+        }
+    })
+        .catch(error => console.error("Error:", error));
+    })
+}
+
+function log_form() {
+    document.getElementById("log_form").addEventListener('submit', function(event) {
+    event.preventDefault()
+    const fields = document.querySelectorAll ('[data-login]')
+    const Allfields = {}
+    const element = document.querySelectorAll(".form_error")[1]
+    fields.forEach(field => {
+        if (field.value == '') {
+            field.style.backgroundColor = "rgba(255, 0, 0, 0.452)"
+            return;
+        } else {
+            Allfields[field.dataset.login] = field.value
+            field.style.backgroundColor = ""
+            
+        }
+    })
+    console.log(Allfields);
+    fetch("./php/login.php", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(Allfields)
+    })
+    .then(response => response.json()) 
+    .then(data => {
+        let jsonData = data;
+        console.log(jsonData);
+        if (jsonData.success) {
+            element.style.display = "none";
+            alert(jsonData.success); 
+            window.location.href = "PA.html"
+        } else {
+            element.style.display = "block";
+            element.textContent = jsonData.error;
+        }
+    })
+        .catch(error => console.error("Error:", error));
+    })
+}
+
